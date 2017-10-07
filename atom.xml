@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://chace.in/"/>
-  <updated>2017-09-07T14:27:09.000Z</updated>
+  <updated>2017-10-07T05:05:10.000Z</updated>
   <id>http://chace.in/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python生成随机字符串</title>
+    <link href="http://chace.in/2017/10/07/Python%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
+    <id>http://chace.in/2017/10/07/Python生成随机字符串/</id>
+    <published>2017-10-07T04:31:23.000Z</published>
+    <updated>2017-10-07T05:05:10.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>写这篇文章的起因是在看微信JS接口demo的Python版本时，看到了一种生成随机字符串的方式，于是在V2EX上写了一个讨论：<a href="https://www.v2ex.com/t/394944#reply16" target="_blank" rel="external">Python生成一段随机字符串的两种写法</a>。这里是对那个讨论的小结。</p><figure class="highlight autoit"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta"># 方法1</span></div><div class="line">s1 = <span class="string">''</span>.join(<span class="built_in">random</span>.choice(<span class="built_in">string</span>.ascii_letters + <span class="built_in">string</span>.digits) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">10</span>))</div><div class="line"></div><div class="line"><span class="meta"># 方法2</span></div><div class="line">s2 = <span class="string">''</span></div><div class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">10</span>):</div><div class="line">    s2 += <span class="built_in">random</span>.choice(<span class="built_in">string</span>.ascii_letters + <span class="built_in">string</span>.digits)</div><div class="line"></div><div class="line"><span class="meta"># 方法3</span></div><div class="line">s3 = <span class="string">''</span>.join(<span class="built_in">random</span>.choices(<span class="built_in">string</span>.ascii_letters + <span class="built_in">string</span>.digits, k=<span class="number">10</span>))</div><div class="line"></div><div class="line"><span class="meta"># 方法4</span></div><div class="line">s4 = binascii.hexlify(os.urandom(<span class="number">5</span>)).decode()</div><div class="line"></div><div class="line"><span class="meta"># 方法5</span></div><div class="line">s5 = secrets.token_urlsafe(<span class="number">10</span>)</div></pre></td></tr></table></figure><p>下面是对这几种方法的对比：</p><p><strong>速度上来讲，方法4是最快的</strong></p><p>random.choice()和random.choices()底层都是C语言实现。但是因为choice每次只是生成一个随机字符，如果要生成长字符串，需要反复调用Python的函数，导致速度很慢，而choices是一次生成一个k长度的随机字符串，Python代码调用的少，所以速度要快。详情参考附录2。</p><p>然而os.random()内部实现是直接调用的syscall(such as /dev/urandom on Unix or CryptGenRandom on Windows)，所以速度最快。详情参考附录3。</p><p><strong>方便程度来讲，方法5是最好的</strong></p><p>secrets模块从Python 3.6引入，目的是为了实现生成用于加密的随机字符串。</p><p>对于secrets模块和原理的random模块，官方文档的说明是这样的：In particularly, secrets should be used in preference to the default pseudo-random number generator in the random module, which is designed for modelling and simulation, not security or cryptography.详情参见附录4.</p><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol><li><a href="https://www.v2ex.com/t/394944#reply16" target="_blank" rel="external">Python生成一段随机字符串的两种写法</a></li><li><a href="https://hg.python.org/cpython/file/tip/Lib/random.py#l252" target="_blank" rel="external">random模块源码</a></li><li><a href="https://docs.python.org/3/library/os.html?highlight=os%20urandom#os.urandom" target="_blank" rel="external">os.urandom文档</a></li><li><a href="https://docs.python.org/3/library/secrets.html" target="_blank" rel="external">secrets模块文档</a></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;写这篇文章的起因是在看微信JS接口demo的Python版本时，看到了一种生成随机字符串的方式，于是在V2EX上写了一个讨论：&lt;a href=&quot;https://www.v2ex.com/t/394944#reply16&quot; target=&quot;_blank&quot; rel=&quot;exter
+      
+    
+    </summary>
+    
+    
+      <category term="Python" scheme="http://chace.in/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>Linux命令行大全(4)——shell编程</title>
