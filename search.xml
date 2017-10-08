@@ -95,7 +95,8 @@
       <title><![CDATA[Linux命令行大全(2)——配置与环境]]></title>
       <url>/2017/08/11/Linux%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A4%A7%E5%85%A8(2)%E2%80%94%E2%80%94%E9%85%8D%E7%BD%AE%E4%B8%8E%E7%8E%AF%E5%A2%83/</url>
       <content type="html"><![CDATA[<h2 id="1-环境"><a href="#1-环境" class="headerlink" title="1.环境"></a>1.环境</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">printenv | less # 查看本机的各种环境变量</div><div class="line">alias ll=“ls -laF” # 为命令起别名</div></pre></td></tr></table></figure>
-<h2 id="2-vi的使用"><a href="#2-vi的使用" class="headerlink" title="2.vi的使用"></a>2.vi的使用</h2><p>移动光标、删除、复制粘贴对比来记忆就很容易了，都一样。</p>
+<h2 id="2-vi的使用"><a href="#2-vi的使用" class="headerlink" title="2.vi的使用"></a>2.vi的使用</h2><p>这本书里只是简单地讲了一遍，这篇文章讲得更多一些：<a href="http://yannesposito.com/Scratch/en/blog/Learn-Vim-Progressively/" target="_blank" rel="external">Learn Vim Progressively</a>。另外就是阅读<em>:help usr_02.txt</em></p>
+<p>移动光标、删除、复制粘贴对比来记忆就很容易了，都一样。</p>
 <p><strong>移动光标</strong></p>
 <table>
 <thead>
