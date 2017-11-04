@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://chace.in/"/>
-  <updated>2017-10-27T13:48:26.000Z</updated>
+  <updated>2017-11-04T14:39:42.000Z</updated>
   <id>http://chace.in/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://chace.in/2017/11/04/shadowsocks_config/"/>
+    <id>http://chace.in/2017/11/04/shadowsocks_config/</id>
+    <published>2017-11-04T14:37:24.000Z</published>
+    <updated>2017-11-04T14:39:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Please install Python at first</p><h2 id="install"><a href="#install" class="headerlink" title="install"></a>install</h2><p><code>pip install shadowsocks</code></p><h2 id="write-config-file"><a href="#write-config-file" class="headerlink" title="write config file:"></a>write config file:</h2><p>(I am in <code>~/shadowsocks/config.json</code>)<br><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> <span class="attr">"server"</span>:<span class="string">"0.0.0.0"</span>,</div><div class="line"> <span class="attr">"server_port"</span>:<span class="number">8388</span>,</div><div class="line"> <span class="attr">"local_port"</span>:<span class="number">1080</span>,</div><div class="line"> <span class="attr">"password"</span>:<span class="string">"shadowsocks"</span>,</div><div class="line"> <span class="attr">"timeout"</span>:<span class="number">600</span>,</div><div class="line"> <span class="attr">"method"</span>:<span class="string">"aes-256-cfb"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p><h2 id="start"><a href="#start" class="headerlink" title="start:"></a>start:</h2><p><code>ssserver -c ~/shadowsocks/config.json</code></p><h2 id="start-in-background"><a href="#start-in-background" class="headerlink" title="start in background:"></a>start in background:</h2><p><code>ssserver -c ~/config.json -d</code></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Please install Python at first&lt;/p&gt;
+&lt;h2 id=&quot;install&quot;&gt;&lt;a href=&quot;#install&quot; class=&quot;headerlink&quot; title=&quot;install&quot;&gt;&lt;/a&gt;install&lt;/h2&gt;&lt;p&gt;&lt;code&gt;pip in
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Fluent Python(5)——函数装饰器和闭包</title>
