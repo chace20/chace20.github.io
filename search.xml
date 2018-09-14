@@ -3,6 +3,46 @@
   
     
     <entry>
+      <title><![CDATA[Docker学习笔记(二)-工具及底层实现]]></title>
+      <url>/2018/09/14/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)-%E5%B7%A5%E5%85%B7%E5%8F%8A%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/</url>
+      <content type="html"><![CDATA[<h2 id="Docker-compose"><a href="#Docker-compose" class="headerlink" title="Docker compose"></a>Docker compose</h2><p>Compose 中有两个重要的概念：</p>
+<ul>
+<li>服务 (service)：一个应用的容器，实际上可以包括若干运行相同镜像的容器实例。</li>
+<li>项目 (project)：由一组关联的应用容器组成的一个完整业务单元，在 docker-compose.yml 文件中定义。</li>
+</ul>
+<p>命令有点类似docker<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 构建项目中的服务容器</span></div><div class="line">docker-compose build [options] [SERVICE...]</div><div class="line"><span class="comment"># 启动一个service</span></div><div class="line">docker-compose run [options] [-p PORT...] [-e KEY=VAL...] &lt;SERVICE&gt; [COMMAND] [ARGS...]</div><div class="line"><span class="comment"># 启动一个project</span></div><div class="line">docker-compose up</div></pre></td></tr></table></figure></p>
+<p>然后是模板文件docker-compose.yml<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="attr">version:</span> <span class="string">"3"</span></div><div class="line"></div><div class="line"><span class="attr">services:</span></div><div class="line"><span class="attr">  webapp:</span></div><div class="line"><span class="attr">    image:</span> <span class="string">examples/web</span></div><div class="line"><span class="attr">    ports:</span></div><div class="line"><span class="bullet">      -</span> <span class="string">"80:80"</span></div><div class="line"><span class="attr">    volumes:</span></div><div class="line"><span class="bullet">      -</span> <span class="string">"/data"</span></div></pre></td></tr></table></figure></p>
+<h2 id="Docker-machine"><a href="#Docker-machine" class="headerlink" title="Docker machine"></a>Docker machine</h2><p>Docker machine大概是个用来创建管理虚拟机的工具，当然这些虚拟机都装好了Docker Engine。通过这种方式可以方便地创建多个docker节点。</p>
+<blockquote>
+<p>Docker Machine is a tool that lets you install Docker Engine on virtual hosts, and manage the hosts with docker-machine commands. You can use Machine to create Docker hosts on your local Mac or Windows box, on your company network, in your data center, or on cloud providers like Azure, AWS, or Digital Ocean.</p>
+</blockquote>
+<h2 id="Docker-Swarm"><a href="#Docker-Swarm" class="headerlink" title="Docker Swarm"></a>Docker Swarm</h2><p>用于集群管理的一个工具。</p>
+<h3 id="1-创建swarm集群"><a href="#1-创建swarm集群" class="headerlink" title="1.创建swarm集群"></a>1.创建swarm集群</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">docker swarm init --advertise-addr 192.168.99.100</div><div class="line"><span class="comment"># 用machine创建一个worker1节点</span></div><div class="line">docker-machine create -d virtualbox worker1</div><div class="line">docker-machine ssh worker1</div><div class="line"><span class="comment"># 加入swarm集群</span></div><div class="line">docker swarm join \</div><div class="line">    --token SWMTKN-1-49nj1cmql0jkz5s954yi3oex3nedyz0fb0xx14ie39trti4wxv-8vxv8rssmk743ojnwacrr2e7c \</div><div class="line">    192.168.99.100:2377</div><div class="line">docker node ls</div></pre></td></tr></table></figure>
+<h3 id="2-部署服务"><a href="#2-部署服务" class="headerlink" title="2.部署服务"></a>2.部署服务</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 创建nginx服务</span></div><div class="line">docker service create --replicas 3 -p 80:80 --name nginx nginx:1.13.7-alpine</div><div class="line"><span class="comment"># 查看</span></div><div class="line">docker service ps nginx</div><div class="line">docker service logs nginx</div></pre></td></tr></table></figure>
+<h3 id="3-在swarm集群中使用compose来快速部署"><a href="#3-在swarm集群中使用compose来快速部署" class="headerlink" title="3.在swarm集群中使用compose来快速部署"></a>3.在swarm集群中使用compose来快速部署</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">docker stack deploy -c docker-compose.yml wordpress</div><div class="line">docker stack ls</div><div class="line">docker stack down</div></pre></td></tr></table></figure>
+<h2 id="底层实现"><a href="#底层实现" class="headerlink" title="底层实现"></a>底层实现</h2><h3 id="1-命名空间"><a href="#1-命名空间" class="headerlink" title="1. 命名空间"></a>1. 命名空间</h3><p>命名空间是 Linux内核一个强大的特性。每个容器都有自己单独的命名空间，运行在其中的应用都像是在独立的操作系统中运行一样。命名空间保证了容器之间彼此互不影响。</p>
+<h3 id="2-控制组"><a href="#2-控制组" class="headerlink" title="2. 控制组"></a>2. 控制组</h3><p>控制组（cgroups）是Linux内核的一个特性，主要用来对共享资源进行隔离、限制、审计等。只有能控制分配到容器的资源，才能避免当多个容器同时运行时的对系统资源的竞争。</p>
+<h3 id="3-联合文件系统"><a href="#3-联合文件系统" class="headerlink" title="3. 联合文件系统"></a>3. 联合文件系统</h3><p>联合文件系统（UnionFS）是一种分层、轻量级并且高性能的文件系统，它支持对文件系统的修改作为一次提交来一层层的叠加，同时可以将不同目录挂载到同一个虚拟文件系统下(unite several directories into a single virtual filesystem)。</p>
+<h3 id="4-网络"><a href="#4-网络" class="headerlink" title="4. 网络"></a>4. 网络</h3><p>Docker 创建一个容器的时候，会执行如下操作：</p>
+<ul>
+<li>创建一对虚拟接口，分别放到本地主机和新容器中；</li>
+<li>本地主机一端桥接到默认的 docker0 或指定网桥上，并具有一个唯一的名字，如 veth65f9；</li>
+<li>容器一端放到新容器中，并修改名字作为 eth0，这个接口只在容器的命名空间可见；</li>
+<li>从网桥可用地址段中获取一个空闲地址分配给容器的 eth0，并配置默认路由到桥接网卡 veth65f9。</li>
+</ul>
+<p>参考：<a href="https://www.kancloud.cn/docker_practice/docker_practice/469861" target="_blank" rel="external">Docker 网络实现</a></p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> docker </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[RabbitMQ学习笔记]]></title>
       <url>/2018/09/13/RabbitMQ%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
       <content type="html"><![CDATA[<h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apt <span class="keyword">install</span> rabbitmq-<span class="keyword">server</span></div></pre></td></tr></table></figure>
@@ -176,8 +216,8 @@
     </entry>
     
     <entry>
-      <title><![CDATA[Docker学习笔记(一)]]></title>
-      <url>/2018/08/27/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)/</url>
+      <title><![CDATA[Docker学习笔记(一)-基本操作]]></title>
+      <url>/2018/08/27/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/</url>
       <content type="html"><![CDATA[<h2 id="1-基本概念"><a href="#1-基本概念" class="headerlink" title="1. 基本概念"></a>1. 基本概念</h2><p><strong>镜像</strong>：Docker镜像是分层存储的。</p>
 <p><strong>容器</strong>：镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的类和实例一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。</p>
 <p><strong>仓库</strong>：仓库名经常以<em>两段式路径</em>形式出现，比如 jwilder/nginx-proxy，前者往往意味着 Docker Registry 多用户环境下的用户名，后者则往往是对应的软件名。我们可以通过<em>&lt;仓库名&gt;:&lt;标签&gt;</em>的格式来指定具体是这个软件哪个版本的镜像。</p>
@@ -211,7 +251,7 @@
 <p><img src="https://yeasy.gitbooks.io/docker_practice/content/advanced_network/_images/network.png" alt="docker网络"></p>
 <h3 id="6-2-docker内网"><a href="#6-2-docker内网" class="headerlink" title="6.2 docker内网"></a>6.2 docker内网</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 创建一个docker网络</span></div><div class="line">$ docker<span class="built_in"> network </span>create -d<span class="built_in"> bridge </span>my-net</div><div class="line"><span class="comment"># 加入docker网络</span></div><div class="line">$ docker <span class="builtin-name">run</span> -it --rm --name busybox1 --network my-net busybox sh</div></pre></td></tr></table></figure>
 <h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
-<li><a href="https://yeasy.gitbooks.io/docker_practice/content/" target="_blank" rel="external">Docker — 从入门到实践</a></li>
+<li><a href="https://yeasy.gitbooks.io/docker_practice/content/" target="_blank" rel="external">Docker — 从入门到实践</a><br>上面太慢可以看这个：[Docker — 从入门到实践-看云]<a href="https://www.kancloud.cn/docker_practice/docker_practice" target="_blank" rel="external">https://www.kancloud.cn/docker_practice/docker_practice</a></li>
 </ol>
 ]]></content>
       
