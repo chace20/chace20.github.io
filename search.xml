@@ -3,6 +3,29 @@
   
     
     <entry>
+      <title><![CDATA[post]]></title>
+      <url>/2019/01/07/post/</url>
+      <content type="html"><![CDATA[<p>hhhh</p>
+]]></content>
+      
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Fluent Python(14)——迭代器]]></title>
+      <url>/2018/12/21/Fluent%20Python(14)%E2%80%94%E2%80%94%E8%BF%AD%E4%BB%A3%E5%99%A8/</url>
+      <content type="html"></content>
+      
+        
+        <tags>
+            
+            <tag> Python </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Docker学习笔记(二)-工具及底层实现]]></title>
       <url>/2018/09/14/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)-%E5%B7%A5%E5%85%B7%E5%8F%8A%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/</url>
       <content type="html"><![CDATA[<h2 id="Docker-compose"><a href="#Docker-compose" class="headerlink" title="Docker compose"></a>Docker compose</h2><p>Compose 中有两个重要的概念：</p>
@@ -595,7 +618,7 @@
 <p>ERE 扩展正则表达式 <code>grep -E &#39;...&#39;</code></p>
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">find</span> <span class="symbol">&lt;dir&gt;</span> -regex <span class="string">'&lt;regex&gt;'</span></div></pre></td></tr></table></figure>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">? * + &#123;&#125; . <span class="selector-attr">[]</span> # 元字符</div></pre></td></tr></table></figure>
-<h2 id="7-文本处理"><a href="#7-文本处理" class="headerlink" title="7. 文本处理"></a>7. 文本处理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">cut -f &lt;字段编号&gt; &lt;file_name&gt; # 切片某字段</div><div class="line">cat -n # 显示行号</div><div class="line">aspell # 拼写检查</div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> 比较两文件的不同产生一个patch，并且还原文件</span></div><div class="line">diff -Naur &lt;old_file&gt; &lt;new_file&gt; &gt; file_patch</div><div class="line">patch &lt; file_patch</div><div class="line"></div><div class="line">diff -c/-u &lt;file_1&gt; &lt;file_2&gt; # 将file_1与file_2进行比较</div></pre></td></tr></table></figure>
+<h2 id="7-文本处理"><a href="#7-文本处理" class="headerlink" title="7. 文本处理"></a>7. 文本处理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">cut -f &lt;字段编号&gt; &lt;file_name&gt; # 切片某字段</div><div class="line">cat -n # 显示行号</div><div class="line">aspell # 拼写检查</div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> 比较两文件的不同产生一个patch，并且还原文件</span></div><div class="line">diff -Naur &lt;old_file&gt; &lt;new_file&gt; &gt; file_patch</div><div class="line">patch &lt; file_patch</div><div class="line"></div><div class="line">diff -c/-u &lt;file_1&gt; &lt;file_2&gt; # 将file_1与file_2进行比较</div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> cut以逗号为分隔符，1-5字段的内容</span></div><div class="line">cut -d "," -f "1,2-4,5" &lt;file&gt;</div></pre></td></tr></table></figure>
 <h2 id="8-格式化输出"><a href="#8-格式化输出" class="headerlink" title="8. 格式化输出"></a>8. 格式化输出</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">printf "format" arguments # 格式化输出</div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> 输出manual到PDF文件</span></div><div class="line">zcat /usr/share/man/man1/ls.1.gz | groff -mandoc &gt; ~/foo.ps</div><div class="line">ps2pdf foo.ps ls.pdf</div><div class="line"></div><div class="line">a2ps -o ~/ls.ps # ASCII-&gt;PostScript</div><div class="line">lpstat -s # 查看打印机状态</div></pre></td></tr></table></figure>
 <h2 id="9-编译程序"><a href="#9-编译程序" class="headerlink" title="9. 编译程序"></a>9. 编译程序</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">make # 编译程序</div><div class="line">./configure # 分析生成环境</div><div class="line">make install # 默认安装到/usr/local/bin</div></pre></td></tr></table></figure>
 ]]></content>
@@ -741,11 +764,11 @@
 <h2 id="2-操作文件与目录"><a href="#2-操作文件与目录" class="headerlink" title="2. 操作文件与目录"></a>2. 操作文件与目录</h2><p><code>-r</code> 一般用于文件夹目录树的递归操作，复制、删除等</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir    cp    mv</div></pre></td></tr></table></figure>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rm -r &lt;dir&gt;</div></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash"> 建立硬链接和软链接</span></div><div class="line">in &lt;file&gt; &lt;file_hard&gt;</div><div class="line">in -s &lt;file&gt; &lt;file_soft&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash"> 建立硬链接和软链接</span></div><div class="line">ln &lt;file&gt; &lt;file_hard&gt;</div><div class="line">ln -s &lt;file&gt; &lt;file_soft&gt;</div></pre></td></tr></table></figure>
 <h2 id="3-查看命令的属性"><a href="#3-查看命令的属性" class="headerlink" title="3. 查看命令的属性"></a>3. 查看命令的属性</h2><figure class="highlight ada"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span>    <span class="type">which    </span>whatis</div></pre></td></tr></table></figure>
 <p>最重要的命令：man、info、help<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">man -k &lt;search_string&gt; # 查找哪些命令可用</div></pre></td></tr></table></figure></p>
 <h2 id="4-重定向"><a href="#4-重定向" class="headerlink" title="4. 重定向"></a>4. 重定向</h2><p>重定向符和管道符的区别：<br><figure class="highlight dns"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">重定向符将stdout重定向到&gt;后接的文件中；</div><div class="line">管道<span class="keyword">A</span>|B将程序<span class="keyword">A</span>的标准输出重定向到程序B的标准输入中。</div></pre></td></tr></table></figure></p>
-<p>重定向：<br><figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;  标准输出重定向</div><div class="line"><span class="meta">2&gt; </span> 标准错误重定向</div><div class="line">&amp;&gt; 标准输出+标准错误重定向</div><div class="line">&gt;&amp;<span class="number">2</span> 标准输出重定向到标准错误中 （可用于shell脚本输出错误信息）</div></pre></td></tr></table></figure></p>
+<p>重定向：<br><figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt;  标准输出重定向</div><div class="line"><span class="meta">2&gt; </span> 标准错误重定向</div><div class="line">&amp;&gt; 标准输出+标准错误重定向</div><div class="line">&gt;&amp;<span class="number">2</span> 标准输出重定向到标准错误中 （可用于shell脚本输出错误信息）</div><div class="line">nohup &lt;program&gt; &amp;&gt; xxx.out &amp;  # 在后台执行命令，并将标准输出+标准错误重新向到xxx.out中</div></pre></td></tr></table></figure></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">wc -l # 统计行数  </div><div class="line">wc -w # 统计字数</div><div class="line">head/tail -n &lt;num&gt;</div><div class="line">tee # 读取标准输入，同时输出到标准输出和文件中，相当于可以在中途截取掉信息。</div></pre></td></tr></table></figure>
 <h2 id="5-快捷键"><a href="#5-快捷键" class="headerlink" title="5. 快捷键"></a>5. 快捷键</h2><table>
 <thead>
@@ -783,7 +806,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="6-权限"><a href="#6-权限" class="headerlink" title="6. 权限"></a>6. 权限</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">su    passwd</div><div class="line">chmod xxx &lt;file&gt;</div><div class="line">chown [ower][:[group]] &lt;file&gt;</div></pre></td></tr></table></figure>
+<h2 id="6-权限"><a href="#6-权限" class="headerlink" title="6. 权限"></a>6. 权限</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">su    passwd</div><div class="line">sudo gpasswd -a $USER &lt;group&gt; # 添加当前用户到指定组</div><div class="line">chmod xxx &lt;file&gt;</div><div class="line">chown [ower][:[group]] &lt;file&gt;</div></pre></td></tr></table></figure>
 <h2 id="7-进程"><a href="#7-进程" class="headerlink" title="7. 进程"></a>7. 进程</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ps    top    pstree</div><div class="line">kill -9 &lt;pid/jobspec&gt; # 杀死进程</div><div class="line">kill -l # 查看所有信号格式</div><div class="line">killall -9 &lt;name&gt; # 杀死指定程序的所有进程</div></pre></td></tr></table></figure>
 <p>前后台进程切换：</p>
 <p><img src="process-switch.png" alt="前后台进程切换"></p>
