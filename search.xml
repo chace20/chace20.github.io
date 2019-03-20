@@ -3,6 +3,36 @@
   
     
     <entry>
+      <title><![CDATA[Fluent Python(17-18)——并发]]></title>
+      <url>/2018/12/21/Fluent%20Python(17-18)%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91/</url>
+      <content type="html"><![CDATA[<h1 id="17-concurrent处理多进程和多线程"><a href="#17-concurrent处理多进程和多线程" class="headerlink" title="17. concurrent处理多进程和多线程"></a>17. concurrent处理多进程和多线程</h1><h2 id="两种方式"><a href="#两种方式" class="headerlink" title="两种方式"></a>两种方式</h2><ol>
+<li>线程池和进程池：ThreadPoolExecutor和ProcessPoolExecutor</li>
+<li>ThreadPoolExecutor.map(func, list_of_param)返回生成器，获取各个函数返回的值。获取返回值时会<strong>阻塞</strong>，返回结果的顺序与调用的顺序一致。</li>
+<li>ThreadPoolExecutor.submit(func, param)返回future对象，futures.as_completed(list_of_future)返回迭代器，在任一future运行结束后产出future。之后可以使用future.result()获取结果，这样可以<strong>不阻塞</strong>。</li>
+<li>另一种方式是future.add_done_callback(callback)</li>
+</ol>
+<h2 id="性能相关"><a href="#性能相关" class="headerlink" title="性能相关"></a>性能相关</h2><ol>
+<li>CPython解释器本身不是线程安全的，因此有GIL，一次只允许一个线程执行Python字节码。</li>
+<li>标准库中阻塞性IO操作在等待系统返回结果时会释放GIL，因此IO密集型操作可以用多线程并发；time.sleep()也会释放GIL实现并发。</li>
+<li>CPU密集型操作使用多进程并发。</li>
+<li>PyPy虽然没有释放GIL，但是因为有JIL，在CPU密集型工作时比CPython快。</li>
+</ol>
+<h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><p>注意：with块结束后主程序才会继续往下执行，或者显式地调用executor.shutdown(wait=False)不等待继续执行。</p>
+<p>shutdown(wait=True)的含义：</p>
+<p>Signal the executor that it should free any resources that it is using when the currently pending futures are done executing.</p>
+<p>所以调用shutdown并不会中断当前进程池中的future，只是通知future执行完毕后释放资源。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Python </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Fluent Python(14-16)——从迭代器到协程]]></title>
       <url>/2018/12/21/Fluent%20Python(14-16)%E2%80%94%E2%80%94%E8%BF%AD%E4%BB%A3%E5%99%A8/</url>
       <content type="html"><![CDATA[<h1 id="14-迭代器与生成器"><a href="#14-迭代器与生成器" class="headerlink" title="14. 迭代器与生成器"></a>14. 迭代器与生成器</h1><ol>
@@ -29,7 +59,7 @@
 </ol>
 <h1 id="16-协程"><a href="#16-协程" class="headerlink" title="16. 协程"></a>16. 协程</h1><h2 id="1-进程、线程、协程"><a href="#1-进程、线程、协程" class="headerlink" title="1. 进程、线程、协程"></a>1. 进程、线程、协程</h2><p>进程：一个运行的程序（代码）就是一个进程，没有运行的代码叫程序，进程是系统资源分配的最小单位，进程拥有自己独立的内存空间，所有进程间数据不共享，开销大。</p>
 <p>线程: cpu调度执行的最小单位，也叫执行路径，不能独立存在，依赖进程存在，一个进程至少有一个线程，叫主线程，而多个线程共享内存（数据共享，共享全局变量),从而极大地提高了程序的运行效率。 </p>
-<p>协程: 可以理解一种用户态的轻量级线程，协程的调度完全由用户控制。协程拥有自己的寄存器上下文和栈。协程调度时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈，直接操中栈则基本没有内核切换的开销，可以不加锁的访问全局变量，所以上下文的切换非常快。</p>
+<p>协程: 可以理解一种<strong>用户态的轻量级线程</strong>，协程的调度完全由用户控制。协程拥有自己的寄存器上下文和栈。协程调度时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈，直接操中栈则基本没有内核切换的开销，可以不加锁的访问全局变量，所以上下文的切换非常快。</p>
 <p>协程与子程序的区别：调用子程序执行到return之后子程序就完全返回到主程序了，而协程会保存现场，下次从中断点继续执行。（中断）</p>
 <p>协程与线程优势：1. 没有多线程切换的开销，寄存器和栈都保存在用户态。2. 不需要锁机制，因为是在一个线程中，不存在写变量冲突问题。所以协程是一种协作式多任务，多线程是一种抢占式多任务。</p>
 <p>Python里CPU密集型使用多进程，IO密集型使用多线程或协程。</p>
