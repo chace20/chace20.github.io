@@ -4,7 +4,7 @@
     
     <entry>
       <title><![CDATA[Fluent Python(17-18)——并发]]></title>
-      <url>/2018/12/21/Fluent%20Python(17-18)%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91/</url>
+      <url>/2019/03/11/Fluent%20Python(17-18)%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91/</url>
       <content type="html"><![CDATA[<h1 id="17-concurrent处理多进程和多线程"><a href="#17-concurrent处理多进程和多线程" class="headerlink" title="17. concurrent处理多进程和多线程"></a>17. concurrent处理多进程和多线程</h1><h2 id="两种方式"><a href="#两种方式" class="headerlink" title="两种方式"></a>两种方式</h2><ol>
 <li>线程池和进程池：ThreadPoolExecutor和ProcessPoolExecutor</li>
 <li>ThreadPoolExecutor.map(func, list_of_param)返回生成器，获取各个函数返回的值。获取返回值时会<strong>阻塞</strong>，返回结果的顺序与调用的顺序一致。</li>
@@ -34,7 +34,7 @@
     
     <entry>
       <title><![CDATA[Fluent Python(14-16)——从迭代器到协程]]></title>
-      <url>/2018/12/21/Fluent%20Python(14-16)%E2%80%94%E2%80%94%E8%BF%AD%E4%BB%A3%E5%99%A8/</url>
+      <url>/2019/03/03/Fluent%20Python(14-16)%E2%80%94%E2%80%94%E8%BF%AD%E4%BB%A3%E5%99%A8/</url>
       <content type="html"><![CDATA[<h1 id="14-迭代器与生成器"><a href="#14-迭代器与生成器" class="headerlink" title="14. 迭代器与生成器"></a>14. 迭代器与生成器</h1><ol>
 <li><p><strong>可迭代的对象</strong>：使用iter内置函数可以获取迭代器的对象。如果对象实现了<code>__iter__</code>方法，能够返回一个迭代器，那么对象就是可迭代的。</p>
 </li>
