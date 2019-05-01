@@ -15,7 +15,7 @@
 <p>shutdown(wait=True)的含义：</p>
 <p>Signal the executor that it should free any resources that it is using when the currently pending futures are done executing.</p>
 <p>所以调用shutdown并不会中断当前进程池中的future，只是通知future执行完毕后释放资源。</p>
-<h1 id="18。-asyncio协程处理并发"><a href="#18。-asyncio协程处理并发" class="headerlink" title="18。 asyncio协程处理并发"></a>18。 asyncio协程处理并发</h1><h2 id="yield-from-await的概念"><a href="#yield-from-await的概念" class="headerlink" title="yield from/await的概念"></a>yield from/await的概念</h2><p>在调用方-委派生成器-子生成器模型中：<br>在gen中使用yield from subgen()时，subgen获得控制权，把产出的值传给gen的调用方。gen会阻塞，等待subgen()产出值。<br>yield from的主要功能是打开双向通道，把最外层的调用方与最内层的子生成器连接起来，这样二者可以直接发送(send)和产出(yield)值。（在Python 3.5以上，可以使用await代替yield from，更容易理解）<br>假设yield from出现在委派生成器中，客户端代码驱动着委派生成器，而委派生成器驱动着子生成器。</p>
+<h1 id="18-asyncio协程处理并发"><a href="#18-asyncio协程处理并发" class="headerlink" title="18. asyncio协程处理并发"></a>18. asyncio协程处理并发</h1><h2 id="yield-from-await的概念"><a href="#yield-from-await的概念" class="headerlink" title="yield from/await的概念"></a>yield from/await的概念</h2><p>在调用方-委派生成器-子生成器模型中：<br>在gen中使用yield from subgen()时，subgen获得控制权，把产出的值传给gen的调用方。gen会阻塞，等待subgen()产出值。<br>yield from的主要功能是打开双向通道，把最外层的调用方与最内层的子生成器连接起来，这样二者可以直接发送(send)和产出(yield)值。（在Python 3.5以上，可以使用await代替yield from，更容易理解）<br>假设yield from出现在委派生成器中，客户端代码驱动着委派生成器，而委派生成器驱动着子生成器。</p>
 <p>asyncio中：<br>可以这样理解，yield from跟普通调用的区别就在于不会阻塞事件循环。类似于epoll。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 不会阻塞事件循环，因为当调用了yield from以后，控制权就回到事件循环手中了。</span></div><div class="line">resp = <span class="keyword">yield</span> <span class="keyword">from</span> aiohttp.request(<span class="string">'GET'</span>, url)</div><div class="line"><span class="comment"># resp = await aiohttp.request('GET', url) 用await更容易理解</span></div><div class="line"><span class="comment"># 会阻塞主线程</span></div><div class="line">resp = aiohttp.request(<span class="string">'GET'</span>, url)</div></pre></td></tr></table></figure></p>
 <p>yield from的用法：</p>
 <ol>
@@ -24,10 +24,7 @@
 </ol>
 <p>在asyncio中：<br>我们编写的协程链条始终通过把最外层委派生成器传给asyncio包API中的某个函数(如loop.run_until_complete(…))驱动。也就是说，调用next(…)或者send(…)的操作由asyncio的事件循环完成。</p>
 <p>概括起来：使用asyncio包时，使用yield from架起管道，让asyncio的事件循环(通过我们编写的协程)，驱动执行底层异步IO操作的库函数。</p>
-<h2 id="使用asyncio的步骤"><a href="#使用asyncio的步骤" class="headerlink" title="使用asyncio的步骤"></a>使用asyncio的步骤</h2><ol>
-<li>创建task(可选)</li>
-</ol>
-<p>创建单个task：</p>
+<h2 id="使用asyncio的步骤"><a href="#使用asyncio的步骤" class="headerlink" title="使用asyncio的步骤"></a>使用asyncio的步骤</h2><h3 id="1-创建task-可选"><a href="#1-创建task-可选" class="headerlink" title="1. 创建task(可选)"></a>1. 创建task(可选)</h3><p>创建单个task：</p>
 <ul>
 <li>asyncio.async(…)</li>
 <li>BaseEventLoop.create_task(…)</li>
@@ -37,18 +34,11 @@
 <li>asyncio.wait(coros)  全部协程执行完毕后返回结果</li>
 <li>asyncio.as_completed(coros)  返回一个生成器，当有协程完成时就迭代</li>
 </ul>
-<ol>
-<li>获取事件循环</li>
-</ol>
-<p>loop = asyncio.get_event_loop()</p>
-<ol>
-<li><p>将task(s)或者coro加入到事件循环中</p>
-<ul>
+<h3 id="2-获取事件循环"><a href="#2-获取事件循环" class="headerlink" title="2. 获取事件循环"></a>2. 获取事件循环</h3><p>loop = asyncio.get_event_loop()</p>
+<h3 id="3-将task-s-或者coro加入到事件循环中"><a href="#3-将task-s-或者coro加入到事件循环中" class="headerlink" title="3. 将task(s)或者coro加入到事件循环中"></a>3. 将task(s)或者coro加入到事件循环中</h3><ul>
 <li>loop.run_until_complete(coro/task)   普通运行loop</li>
 <li>loop.run_in_executor(coro/task)   在ThreadPoolExecutor中运行loop</li>
 </ul>
-</li>
-</ol>
 <p><strong>需要注意的是，第1步不是必须的，如果在第3步中传入的是协程而不是task，那么run_until_complete()会将协程包装成task，之所以用第1步，是为了持有task对象，方便对协程进行操作，比如获取完成的task的result、task.cancel()等。</strong></p>
 <p>至于协程本身的定义，内部使用yield from关键字，函数使用@asyncio.coroutine装饰。</p>
 <p><strong>对于Python 3.5以上，内部使用await代替yield from，函数使用async def func()</strong>，语义更加明确。</p>
