@@ -3,6 +3,57 @@
   
     
     <entry>
+      <title><![CDATA[快速熟悉开源项目]]></title>
+      <url>/2019/08/30/%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE(%E8%BD%AC%E8%BD%BD)/</url>
+      <content type="html"><![CDATA[<p>《Docker-容器与容器云》中的一篇文章，觉得挺不错，所以从网上转载了一份过来。原文：<a href="https://my.oschina.net/baijuminglu/blog/834911" target="_blank" rel="external">快速熟悉开源项目</a></p>
+<h2 id="查阅文档"><a href="#查阅文档" class="headerlink" title="查阅文档"></a>查阅文档</h2><p>查阅文档包括查阅文档与博客，最好是带着问题去阅读。</p>
+<h3 id="1-查阅文档与博客"><a href="#1-查阅文档与博客" class="headerlink" title="1.查阅文档与博客"></a>1.查阅文档与博客</h3><p>一个好的开源项目未必会火，但是一个火的开源项目一定有其可取之处，而从众心理又会让更多人去研究它。所以，要熟悉你想研究的开源项目，第一步就是在搜索引擎中查找该项目的博客和资料。通过快速阅读介绍开源项目架构，使用方法等这类文章，你就能大体了解该项目的意义，功能和基本使用方法。</p>
+<p>通过搜索到的资料，如果你觉得该项目就是你想要的，那么便可以很耐心的阅读项目提供的官方文档，从中学习一些具体的下载，安装和使用方法，以便了解项目全貌。</p>
+<h3 id="2-带着问题去阅读"><a href="#2-带着问题去阅读" class="headerlink" title="2.带着问题去阅读"></a>2.带着问题去阅读</h3><p>阅读文档过程中不能盲目，需要带着如下问题去阅读。</p>
+<ul>
+<li>这个项目解决了什麽问题？</li>
+<li>这个项目涉及了哪些成熟的技术？</li>
+<li>这个项目是否符合我的要求（用户规模，使用场景，性能，安全性等）？</li>
+<li>当阅读完文档后，能否尝试画出大致的架构图？</li>
+</ul>
+<h2 id="动手实践"><a href="#动手实践" class="headerlink" title="动手实践"></a>动手实践</h2><p>实践是最好的老师，在阅读文档过程中，按照文档的操作指南亲手实践，不但有助于加深理解，同时还会注意到很多细节，可以更清楚的感受到项目是否符合自己的需求。</p>
+<h3 id="1-搭建项目"><a href="#1-搭建项目" class="headerlink" title="1.搭建项目"></a>1.搭建项目</h3><p>实践过程一般都遵循项目的README文件，进行部署安装和尝试。如果有现成使用项目的事例代码，那么也可以按照示例代码进行尝试。此时若是运行顺利，则可以尝试着根据自己的理解对事例代码进行修改。若是出现问题也无需慌张，只需要将问题的异常信息当作关键词在搜索引擎中查找即可。如果实在找不到解决方案，那么就可以提交到开源项目的邮件列表中，开源社区的人们一般都比较热心，相信很快就可以解决问题。</p>
+<p>基本尝试过后，我们可以使用项目的一些高级功能，如一些高级配置项，较为复杂的API等。相信一个运作良好的开源项目，为了方便社区的贡献者们可以快速加入，必然会提供一份较为详尽的指南，你只需挑选你感兴趣的部分阅读即可。</p>
+<p>基本尝试过后，我们可以使用项目的一些高级功能，如一些高级配置项，较为复杂的API等。相信一个运作良好的开源项目，为了方便社区的贡献者们可以快速加入，必然会提供一份较为详尽的指南，你只需挑选你感兴趣的部分阅读即可。</p>
+<p>下面推荐几个解决疑惑的好网站</p>
+<ul>
+<li>Google搜索引擎: google.com</li>
+<li>Stackoverflow: stackoverflow.com</li>
+<li>项目相关的Google讨论组: groups.google.com</li>
+<li>对GitHub的项目提Issues: github.com</li>
+</ul>
+<h3 id="2-深层次改动"><a href="#2-深层次改动" class="headerlink" title="2.深层次改动"></a>2.深层次改动</h3><p>有趣的是，很多开源项目一般都会为了方便用户使用，提供release的版本。如果基本的部署和使用已经成功的话，强烈建议你从源码构建和部署该项目。这样你就能从开发，调试到发布整个一体化的全部过程，由此全方位的感受项目的优缺点。</p>
+<p>基本尝试过后，我们可以使用项目的一些高级功能，如一些高级配置项，较为复杂的API等。相信一个运作良好的开源项目，为了方便社区的贡献者们可以快速加入，必然会提供一份较为详尽的指南，你只需挑选你感兴趣的部分阅读即可。</p>
+<h2 id="阅读源码"><a href="#阅读源码" class="headerlink" title="阅读源码"></a>阅读源码</h2><p>经过以上两步之后，你必然对项目的大致情况了然于胸，想更深入的了解自然非阅读源码莫属了。</p>
+<p>一般阅读源码有两种习惯方式，一是根据命令行的代码调用过程阅读；二是根据架构分模块阅读。</p>
+<h3 id="1-跟着运行过程阅读"><a href="#1-跟着运行过程阅读" class="headerlink" title="1.跟着运行过程阅读"></a>1.跟着运行过程阅读</h3><p>刚上手的过程可以使用的一种方式。通过实践过程中对对某个命令或参数的理解，从主干开始，一步一步理清这个命令在运行过程中代码调用的路径。通过debug工具观察变量和函数，修改源码打印日志，可以更好的帮你理解源码。</p>
+<p>当理清这个过程后可以将这个过程用流程图的形式记录下来，从而加深印象，方便下次阅读的时候快速会议和对比。</p>
+<h3 id="2-分模块阅读"><a href="#2-分模块阅读" class="headerlink" title="2.分模块阅读"></a>2.分模块阅读</h3><p>在理清了程序运行的基本流程后，可以根据架构上各个模块的作用，挑选你有兴趣的部分阅读，如网络，存储，通信，用户接口，界面等，选择一个模块深入到实现细节中。</p>
+<p>此时也可以带着如下几个问题帮助自己理解。</p>
+<ul>
+<li>调用了什麽底层库？</li>
+<li>采用了什麽设计模式？</li>
+<li>这麽写有什麽好处？</li>
+</ul>
+<p>如果在阅读源码的过程中出现瓶颈，你一时无法理解代码的用意，不妨去阅读一下相关的单元测试。一个好的单元测试通常都描述了要测试代码的主要功能和数据边界，通过运行和理解单元测试，可以有效的帮助理解源码。</p>
+<p>相信经过以上三步，你必然已经对这个开源项目非常熟悉了。此时如果你感兴趣，也可以加入其中为开源社区做出一定贡献。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> 经验之谈 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Go tour(3)-Concurrency]]></title>
       <url>/2019/06/11/Go-tour-3-Concurrency/</url>
       <content type="html"><![CDATA[<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><ul>
@@ -821,7 +872,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[function] foo [()] &#123;</div><div class="line">    # action</div><div class="line">    [return int]</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> 定义其实是两种形式:</span></div><div class="line">function foo &#123;...&#125;</div><div class="line">foo () &#123;...&#125;</div><div class="line"></div><div class="line">foo # 函数调用</div></pre></td></tr></table></figure>
 <p>不像类C语言在函数括号中传递参数，shell中使用<strong>位置参数</strong>来进行参数传递。shell中的返回值通过<code>$?</code>接收。<br>如下所示：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">foo () &#123;</div><div class="line">    echo $0 # 输出的永远是运行脚本的命令本身</div><div class="line">    echo $($1+$2) # 输出58</div><div class="line">    return (($1+$2+2)) # 返回60，返回值范围是0~255整数</div><div class="line">&#125;</div><div class="line">foo 13 45 # 函数调用</div><div class="line">echo $? # 输出的是最后一次调用foo的返回值60</div></pre></td></tr></table></figure>
-<p>一些特殊的参数如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">echo $@ # 输出的是"$1""$2""$3"</div><div class="line">echo $$ # 输出当前进程pid</div><div class="line">echo $# # 输出命令参数个数</div><div class="line">echo $? # 输出上个函数的返回值</div><div class="line">echo $! # 输出后台中最后一次运行的进程pid</div></pre></td></tr></table></figure></p>
+<p>一些特殊的参数如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">echo $* # 输出的是"$1 $2 $3"</div><div class="line">echo $@ # 输出的是"$1""$2""$3"</div><div class="line">echo $$ # 输出当前进程pid</div><div class="line">echo $# # 输出命令参数个数</div><div class="line">echo $? # 输出上个函数的返回值</div><div class="line">echo $! # 输出后台中最后一次运行的进程pid</div></pre></td></tr></table></figure></p>
 <h2 id="4-执行与调试"><a href="#4-执行与调试" class="headerlink" title="4. 执行与调试"></a>4. 执行与调试</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash"> +x 可以显示执行的命令，加号开头的都是命令串</span></div><div class="line"><span class="meta">#</span><span class="bash"> +n 是检测语法</span></div><div class="line"><span class="meta">#</span><span class="bash"> -x和-n是不执行命令，+x和+n是同时执行命令</span></div><div class="line">bash -n &lt;script&gt; </div><div class="line"><span class="meta">#</span><span class="bash"> 使用<span class="built_in">source</span>是在当前进程中执行.sh，否则是新开一个子进程执行</span></div><div class="line">source &lt;script&gt;</div></pre></td></tr></table></figure>
 <h2 id="5-实现quicksort"><a href="#5-实现quicksort" class="headerlink" title="5. 实现quicksort"></a>5. 实现quicksort</h2><p>拿个quicksort来作为练习倒是一个不错的选择</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash">!/bin/bash -x</span></div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> a quicksort algorithm implement <span class="keyword">in</span> shell</span></div><div class="line"></div><div class="line">arr=(3 23 4 1 45 56 34 78 79 89)</div><div class="line"></div><div class="line">get_pos() &#123;</div><div class="line">    local low=$1</div><div class="line">    local high=$2</div><div class="line">    local value=$&#123;arr[$low]&#125; # 数组取值</div><div class="line"></div><div class="line">    while (( $low&lt;$high )); do</div><div class="line">        while (( $low&lt;$high &amp;&amp; $value&lt;=$&#123;arr[$high]&#125; )); do</div><div class="line">            high=$(($high-1))</div><div class="line">        done</div><div class="line">        if (( $low&lt;$high )); then</div><div class="line">            arr[$low]=$&#123;arr[$high]&#125;</div><div class="line">            ((++low)) # 整数运算只能在(())中</div><div class="line">        fi</div><div class="line">        while (( $low&lt;$high &amp;&amp; $value&gt;=$&#123;arr[$low]&#125; )); do</div><div class="line">            low=$(($low+1))</div><div class="line">        done</div><div class="line">        if (( $low&lt;$high )); then</div><div class="line">            arr[$high]=$&#123;arr[$low]&#125;</div><div class="line">            ((--high)) # 整数运算只能在(())中</div><div class="line">        fi</div><div class="line">    done</div><div class="line"></div><div class="line">    arr[$low]=$value</div><div class="line">    return $low</div><div class="line">&#125;</div><div class="line"></div><div class="line">quicksort() &#123;</div><div class="line">    local low=$1</div><div class="line">    local high=$2</div><div class="line">    local pos=0</div><div class="line">    local tempLow=0</div><div class="line">    local tempHigh=0</div><div class="line">    if (( $low&lt;$high )); then</div><div class="line">        get_pos $low $high</div><div class="line">        pos=$? # 获得返回值</div><div class="line">        tempLow=$(($pos-1))</div><div class="line">        tempHigh=$(($pos+1))</div><div class="line">        quicksort $low $tempLow</div><div class="line">        quicksort $tempHigh $high</div><div class="line">    fi</div><div class="line">&#125;</div><div class="line"></div><div class="line">quicksort 0 9 # 调用函数</div><div class="line"></div><div class="line">echo $&#123;arr[@]&#125; # 另一种形式是$&#123;arr[*]&#125;，两者区别在前者扩展数组单个元素，后者将数组扩展成一个长串</div></pre></td></tr></table></figure>
