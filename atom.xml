@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://chace.in/"/>
-  <updated>2019-08-30T07:37:34.595Z</updated>
+  <updated>2019-08-31T12:53:11.679Z</updated>
   <id>http://chace.in/</id>
   
   <author>
@@ -15,6 +15,51 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CS6.824(3)-Raft</title>
+    <link href="http://chace.in/2019/08/31/CS6.824(3)-Raft/"/>
+    <id>http://chace.in/2019/08/31/CS6.824(3)-Raft/</id>
+    <published>2019-08-31T12:41:50.000Z</published>
+    <updated>2019-08-31T12:53:11.679Z</updated>
+    
+    <content type="html"><![CDATA[<p>Raft作为两大分布式一致性协议之一（另一个就是大名鼎鼎的Paxos），本身是为了解决Paxos学习成本过高，工程实现过于困难的问题。在论文中也是遵循这个原则，因此阅读下来还是比较轻松的，而且也有丰富的图表可以帮助思考。</p><p>不过在实现上还是会有很多坑，再次感受到了分布式编程的困难之处，尤其是调试，也再次印证了printf是最好的调试工具~（事实上只能看日志来调试）</p><p>下面简单过一下Raft比较有意思的点。</p><h2 id="选举安全"><a href="#选举安全" class="headerlink" title="选举安全"></a>选举安全</h2><p>在同一term最多选举出一个leader。</p><p>首先所有节点都是follower，term=0，term相当于一个阶段。</p><p>follower等待一个随机的超时时间，超时以后该节点成为candidate，term+1，向其余节点发起投票请求。</p><p>其余节点发现投票请求中的term&gt;=currentTerm，并且在currentTerm没有投过票，并且投票请求的日志记录至少与自己的日志记录一样新，就授权这次投票请求。</p><p>当某个candidate获得majority的授权以后，成为leader，并且向其余follower发送心跳。</p><p>如果某个term没有leader产生，那么在选举超时以后，会再发起选举。</p><h2 id="Leader的日志完整性"><a href="#Leader的日志完整性" class="headerlink" title="Leader的日志完整性"></a>Leader的日志完整性</h2><p>只要在某个term一条日志被commit，那么这条日志将会出现在所有更高term的leader中。</p><p>假设存在一个比term T大且最小的term U，term U的leader不包含term T已经commit的日志。</p><p>因为要成为leader，必须获得majority follower的投票；同样地，一个日志要被commit，也必须被majority follower接收。所以至少存在一个follower，既接收了term T的leader的日志，也投票给了term U的leader。</p><p>如果term U的leader不包含之前commit的日志，那么这个follower是不会投票给他的。因此会矛盾。</p><p>论文里面是用反证法证明的。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Raft作为两大分布式一致性协议之一（另一个就是大名鼎鼎的Paxos），本身是为了解决Paxos学习成本过高，工程实现过于困难的问题。在论文中也是遵循这个原则，因此阅读下来还是比较轻松的，而且也有丰富的图表可以帮助思考。&lt;/p&gt;
+&lt;p&gt;不过在实现上还是会有很多坑，再次感受到
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>CS6.824(2)-GFS</title>
+    <link href="http://chace.in/2019/08/31/CS6.824(2)-GFS/"/>
+    <id>http://chace.in/2019/08/31/CS6.824(2)-GFS/</id>
+    <published>2019-08-31T12:37:48.000Z</published>
+    <updated>2019-08-31T12:53:16.673Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="GFS的架构"><a href="#GFS的架构" class="headerlink" title="GFS的架构"></a>GFS的架构</h2><p>GFS模型的master，chunkserver。master保存文件的元数据，比如file目录结构，文件大小，文件包含的chunk以及chunk在什么位置。chunkserver上保存的是具体的文件数据。</p><h2 id="GFS读文件过程"><a href="#GFS读文件过程" class="headerlink" title="GFS读文件过程"></a>GFS读文件过程</h2><p>client访问master，获取到文件的chunk所在的chunkserver，然后client直接去这些chunkserver上请求数据。控制流跟数据流是解耦的。</p><h2 id="GFS写文件过程"><a href="#GFS写文件过程" class="headerlink" title="GFS写文件过程"></a>GFS写文件过程</h2><ol><li>client访问master，获取到应该写入chunk所在的chunkserver。（超出一个chunk的话，会把写请求分成多次）</li><li>Master会给chunk授权一个租约，增加chunk的版本号，然后让chunkserver也同样地增加版本号。并且会在chunkserver中给本次写请求指定一个primary节点，由他来负责协调本次的写入。然后回应client，后面client跟master不需要再通信了，这样可以减少master的负载。</li><li>client把数据push到master告诉它的chunkserver上。</li><li>一旦数据push完毕，client发送写请求给primary。primary决定本次写入的顺序并且应用到chunk上。</li><li>primary主节点完成修改后，将这个顺序传递给从节点secondaries，因此他们也能应用同样的修改顺序。</li><li>从节点完成修改后，回应主节点。</li><li>主节点之后回应client成功或者失败状态：<ul><li>主节点和从节点都成功，则本次写入成功；</li><li>如果有失败，那么client会重试写入</li></ul></li></ol><h2 id="GFS的一致性模型"><a href="#GFS的一致性模型" class="headerlink" title="GFS的一致性模型"></a>GFS的一致性模型</h2><p>主要针对并发写文件的过程。在GFS里，有两种写文件的方式，一种是随机写，一种是append追加数据。这里面的一致性有两个维度，确定与一致。一致是指多个副本的内容相同，确定就是与串行写入时的内容相同。</p><p>append会有一个填充的操作，就是发现原来的chunk+新的数据可能超出一个chunk的大小，就先把chunk填满，再通知client在下一块chunk进行append。这里一次append的数据限制为chunk的1/4大小，这样就不会填充太多的无效数据。这样做的原因是前面GFS的写入操作是针对一个chunk的，就是为了避免一次写两块chunk，这样一致性会被破坏掉。</p><p>随机写是一致的但是不确定的，append填充的部分是不一致的，但是其他正常的数据是确定的。</p><p>并发写同一个区域，可能会出现覆盖的情况，导致undefined，但是几个副本的内容是一致的。<br>Record append填充的部分是不一致的（因此也就不一致），但是其他正常的数据是确定的。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;GFS的架构&quot;&gt;&lt;a href=&quot;#GFS的架构&quot; class=&quot;headerlink&quot; title=&quot;GFS的架构&quot;&gt;&lt;/a&gt;GFS的架构&lt;/h2&gt;&lt;p&gt;GFS模型的master，chunkserver。master保存文件的元数据，比如file目录结构，文件大
+      
+    
+    </summary>
+    
+    
+      <category term="分布式系统" scheme="http://chace.in/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
   
   <entry>
     <title>快速熟悉开源项目</title>
@@ -249,9 +294,9 @@
     </summary>
     
     
-      <category term="kubernetes" scheme="http://chace.in/tags/kubernetes/"/>
-    
       <category term="Docker" scheme="http://chace.in/tags/Docker/"/>
+    
+      <category term="kubernetes" scheme="http://chace.in/tags/kubernetes/"/>
     
   </entry>
   
@@ -274,9 +319,9 @@
     </summary>
     
     
-      <category term="kubernetes" scheme="http://chace.in/tags/kubernetes/"/>
-    
       <category term="Docker" scheme="http://chace.in/tags/Docker/"/>
+    
+      <category term="kubernetes" scheme="http://chace.in/tags/kubernetes/"/>
     
   </entry>
   
@@ -300,9 +345,9 @@
     </summary>
     
     
-      <category term="kubernetes" scheme="http://chace.in/tags/kubernetes/"/>
-    
       <category term="Docker" scheme="http://chace.in/tags/Docker/"/>
+    
+      <category term="kubernetes" scheme="http://chace.in/tags/kubernetes/"/>
     
   </entry>
   
@@ -452,53 +497,6 @@
 &lt;li&gt;&lt;strong&gt;装饰器在加载模块时立即执行&lt;/strong&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;即函数装饰器在导入模块时立即执行，而被装饰的函
-      
-    
-    </summary>
-    
-    
-      <category term="Python" scheme="http://chace.in/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python生成随机字符串</title>
-    <link href="http://chace.in/2017/10/07/Python%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
-    <id>http://chace.in/2017/10/07/Python生成随机字符串/</id>
-    <published>2017-10-07T04:31:23.000Z</published>
-    <updated>2017-10-07T05:05:10.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>写这篇文章的起因是在看微信JS接口demo的Python版本时，看到了一种生成随机字符串的方式，于是在V2EX上写了一个讨论：<a href="https://www.v2ex.com/t/394944#reply16" target="_blank" rel="external">Python生成一段随机字符串的两种写法</a>。这里是对那个讨论的小结。</p><figure class="highlight autoit"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta"># 方法1</span></div><div class="line">s1 = <span class="string">''</span>.join(<span class="built_in">random</span>.choice(<span class="built_in">string</span>.ascii_letters + <span class="built_in">string</span>.digits) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">10</span>))</div><div class="line"></div><div class="line"><span class="meta"># 方法2</span></div><div class="line">s2 = <span class="string">''</span></div><div class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">10</span>):</div><div class="line">    s2 += <span class="built_in">random</span>.choice(<span class="built_in">string</span>.ascii_letters + <span class="built_in">string</span>.digits)</div><div class="line"></div><div class="line"><span class="meta"># 方法3</span></div><div class="line">s3 = <span class="string">''</span>.join(<span class="built_in">random</span>.choices(<span class="built_in">string</span>.ascii_letters + <span class="built_in">string</span>.digits, k=<span class="number">10</span>))</div><div class="line"></div><div class="line"><span class="meta"># 方法4</span></div><div class="line">s4 = binascii.hexlify(os.urandom(<span class="number">5</span>)).decode()</div><div class="line"></div><div class="line"><span class="meta"># 方法5</span></div><div class="line">s5 = secrets.token_urlsafe(<span class="number">10</span>)</div></pre></td></tr></table></figure><p>下面是对这几种方法的对比：</p><p><strong>速度上来讲，方法4是最快的</strong></p><p>random.choice()和random.choices()底层都是C语言实现。但是因为choice每次只是生成一个随机字符，如果要生成长字符串，需要反复调用Python的函数，导致速度很慢，而choices是一次生成一个k长度的随机字符串，Python代码调用的少，所以速度要快。详情参考附录2。</p><p>然而os.random()内部实现是直接调用的syscall(such as /dev/urandom on Unix or CryptGenRandom on Windows)，所以速度最快。详情参考附录3。</p><p><strong>方便程度来讲，方法5是最好的</strong></p><p>secrets模块从Python 3.6引入，目的是为了实现生成用于加密的随机字符串。</p><p>对于secrets模块和原理的random模块，官方文档的说明是这样的：In particularly, secrets should be used in preference to the default pseudo-random number generator in the random module, which is designed for modelling and simulation, not security or cryptography.详情参见附录4.</p><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol><li><a href="https://www.v2ex.com/t/394944#reply16" target="_blank" rel="external">Python生成一段随机字符串的两种写法</a></li><li><a href="https://hg.python.org/cpython/file/tip/Lib/random.py#l252" target="_blank" rel="external">random模块源码</a></li><li><a href="https://docs.python.org/3/library/os.html?highlight=os%20urandom#os.urandom" target="_blank" rel="external">os.urandom文档</a></li><li><a href="https://docs.python.org/3/library/secrets.html" target="_blank" rel="external">secrets模块文档</a></li></ol>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;写这篇文章的起因是在看微信JS接口demo的Python版本时，看到了一种生成随机字符串的方式，于是在V2EX上写了一个讨论：&lt;a href=&quot;https://www.v2ex.com/t/394944#reply16&quot; target=&quot;_blank&quot; rel=&quot;exter
-      
-    
-    </summary>
-    
-    
-      <category term="Python" scheme="http://chace.in/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Fluent Python(4)——一等函数</title>
-    <link href="http://chace.in/2017/09/28/Fluent%20Python(4)%E2%80%94%E2%80%94%E4%B8%80%E7%AD%89%E5%87%BD%E6%95%B0/"/>
-    <id>http://chace.in/2017/09/28/Fluent Python(4)——一等函数/</id>
-    <published>2017-09-28T12:48:00.000Z</published>
-    <updated>2017-10-27T13:47:52.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>可调用对象：在自定义的类Cls中实现<strong>call</strong>()方法即可直接使用cls()调用。</p><p>获取关于函数参数的信息：sig=inspect.signature(func)可以查看函数参数的一些信息，还可以使用sig.bind(**args)绑定参数。</p><p>函数可以添加注解，虽然并不会被用到，但是可以增加函数的可读性。<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">def</span> func(<span class="string">parm:</span>str, <span class="string">len:</span> <span class="string">'int &gt; 0'</span>=<span class="number">80</span>) -&gt; <span class="string">str:</span></div><div class="line">    <span class="keyword">return</span> parm</div></pre></td></tr></table></figure></p><h3 id="operator模块的函数支持函数式编程"><a href="#operator模块的函数支持函数式编程" class="headerlink" title="operator模块的函数支持函数式编程"></a>operator模块的函数支持函数式编程</h3><p>itemgetter 获取元素<br>attrgetter 获取对象的属性<br>methodcaller(‘replace’,’ ‘, ‘_’) 在对象上调用参数指定的方法<br><figure class="highlight gcode"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">from operator import itemgetter</div><div class="line">odd=itemgetter<span class="comment">(0,2,4)</span></div><div class="line">odd<span class="comment">(range(10)</span>)</div><div class="line"><span class="attr"># Out[10</span>]: <span class="comment">(0, 2, 4)</span></div></pre></td></tr></table></figure></p><h3 id="functools-partial可以绑定一些参数。"><a href="#functools-partial可以绑定一些参数。" class="headerlink" title="functools.partial可以绑定一些参数。"></a>functools.partial可以绑定一些参数。</h3><p>以下就是定义了一个nfc函数，不用每次都输入NFC这个参数了。<br><figure class="highlight processing"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> unicodedata, functools</div><div class="line"><span class="built_in">nfc</span> = functools.partial(unicodedata.normalize, <span class="string">'NFC'</span>)</div><div class="line">s=<span class="string">'你好'</span></div><div class="line"><span class="built_in">nfc</span>(s)</div><div class="line"># Out[<span class="number">15</span>]: <span class="string">'你好'</span></div></pre></td></tr></table></figure></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;可调用对象：在自定义的类Cls中实现&lt;strong&gt;call&lt;/strong&gt;()方法即可直接使用cls()调用。&lt;/p&gt;
-&lt;p&gt;获取关于函数参数的信息：sig=inspect.signature(func)可以查看函数参数的一些信息，还可以使用sig.bind(**arg
       
     
     </summary>
