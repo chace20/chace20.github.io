@@ -3,6 +3,38 @@
   
     
     <entry>
+      <title><![CDATA[k8s核心组件分析-scheduler]]></title>
+      <url>/2019/09/02/k8s%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6%E5%88%86%E6%9E%90-scheduler/</url>
+      <content type="html"><![CDATA[<p>k8s中的scheduler负责资源调度，具体来说，是将某个pod绑定到某个node上。scheduler的输入是待调度的pod和可调度的node，输出是pod和node的bind对象。</p>
+<p><img src="/img/2019/09/k8s-scheduler.png" alt="scheduler的输入输出"></p>
+<h2 id="k8s采集数据"><a href="#k8s采集数据" class="headerlink" title="k8s采集数据"></a>k8s采集数据</h2><p>要进行调度首先得知道哪些需要调度，哪些node可以调度，调度策略需要很多信息来进行决策。k8s中并不会有消息队列来进行组件之间的通信，scheduler是直接访问APIServer来获取集群信息的。但是如果是暴力轮询肯定会给APIServer带来很大负担。所以scheduler在本地做了cache。</p>
+<p>本地cache主要有两种，一种是对于有序资源信息，比如待调度的pod，使用Queue来保存；另一种是无序资源信息，比如可调度的node，使用链表保存。</p>
+<h2 id="k8s的调度算法"><a href="#k8s的调度算法" class="headerlink" title="k8s的调度算法"></a>k8s的调度算法</h2><p>k8s的调度算法是可插拔的，由算法provider提供，一个provider即提供一个调度策略集合，而这个调度策略集合下会包括很多的计算方法。</p>
+<p>这些具体的计算方法包括两类：predicates和priorities。</p>
+<p>predicates解决pod能不能被调度到某个node上去，而priorities是在可调度的node中排优先级。</p>
+<h3 id="predicates"><a href="#predicates" class="headerlink" title="predicates"></a>predicates</h3><p>有判断会不会HostPort冲突的，也有判断NodeSelector的。所有predicates都满足，则该pod和该node是可以绑定的。</p>
+<h3 id="priorities"><a href="#priorities" class="headerlink" title="priorities"></a>priorities</h3><p>这里是采用计算score的方式。每个priority算法返回一个0~10的score，然后计算<code>sum = priorities · weights</code>(这里是点乘的意思)。调度pod到得分最高的pod上去。</p>
+<p>一般就根据资源分配情况，selector的分配情况来计算。</p>
+<h2 id="k8s的启动与运行"><a href="#k8s的启动与运行" class="headerlink" title="k8s的启动与运行"></a>k8s的启动与运行</h2><ol>
+<li>收集scheduler产生的事件信息，发送给APIServer</li>
+<li>创建一个http server，端口默认是10250</li>
+<li>根据配置创建启动scheduler</li>
+<li>注册metrics规则，检测scheduler的性能</li>
+</ol>
+<p>k8s在完成绑定以后，其实是创建了一个Binding对象，发送给APIServer。（最后由Controller Manager通知绑定的node的kubelet创建绑定的pod）</p>
+<h2 id="multi-scheduler的问题"><a href="#multi-scheduler的问题" class="headerlink" title="multi-scheduler的问题"></a>multi-scheduler的问题</h2><p>如果需要多个调度器，目前的解决办法是使用annotations的方式给pod指定由某个scheduler调度。</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> kubernetes </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Docker架构分析]]></title>
       <url>/2019/09/01/Docker%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90/</url>
       <content type="html"><![CDATA[<h2 id="Docker架构概览"><a href="#Docker架构概览" class="headerlink" title="Docker架构概览"></a>Docker架构概览</h2><p><strong>网上很多架构图中都有Docker Engine和Job，但是1.7版本其实不再用这种方式。</strong></p>
