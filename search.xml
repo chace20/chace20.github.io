@@ -3,6 +3,175 @@
   
     
     <entry>
+      <title><![CDATA[漫谈容器与容器云]]></title>
+      <url>/2019/12/05/%E6%BC%AB%E8%B0%88%E5%AE%B9%E5%99%A8%E4%B8%8E%E5%AE%B9%E5%99%A8%E4%BA%91/</url>
+      <content type="html"><![CDATA[<h1 id="服务管理"><a href="#服务管理" class="headerlink" title="服务管理"></a>服务管理</h1><p>服务编排与部署</p>
+<p>yaml</p>
+<p>声明式部署</p>
+<p>服务的调度</p>
+<p>scheduler</p>
+<p>服务高可用（健康检查、故障恢复）</p>
+<p>kubelet</p>
+<p>rc的重启</p>
+<p>服务迁移</p>
+<p>冷迁移</p>
+<p>服务缩扩容</p>
+<p>hpa, rc</p>
+<p>服务发现与注册</p>
+<p>service, endpoints</p>
+<p>服务负载均衡</p>
+<p>ingress, service</p>
+<p>服务运行监控（监控、日志）</p>
+<p>prometheus, fluentd</p>
+<h1 id="资源管理"><a href="#资源管理" class="headerlink" title="资源管理"></a>资源管理</h1><p>计算</p>
+<p>request， limits, resourceQuota</p>
+<p>网络</p>
+<p>二层网络 flannel</p>
+<p>存储</p>
+<p>pv, pvc, stroageclass</p>
+<p>资源隔离</p>
+<p>namespace</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Docker </tag>
+            
+            <tag> 容器云 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Linux环境编程(4)-进程生命周期]]></title>
+      <url>/2019/10/11/Linux%E7%8E%AF%E5%A2%83%E7%BC%96%E7%A8%8B-4-%E8%BF%9B%E7%A8%8B%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</url>
+      <content type="html"><![CDATA[<h1 id="进程的层次关系"><a href="#进程的层次关系" class="headerlink" title="进程的层次关系"></a>进程的层次关系</h1><p>pid是进程ID，pgid是进程组ID，sid是会话ID。默认情况下，新创建的进程会继承父进程的进程组ID和会话ID。 </p>
+<p>比喻：会话是公司，进程组是部门，进程是员工。 </p>
+<p>进程组方便管理一组进程，比如发送信号可以发给一个进程组。 </p>
+<p>对于shell会话来说，登录时的进程为会话首进程。之后启动的进程分为前台进程组和后台进程组的概念。只有一个前台进程组，可以有多个后台进程组。前台进程组的进程在控制终端读取输入，比如ctrl+c </p>
+<h1 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h1><p>fork以后会用写时复制技术复制父进程的数据段、代码段、栈、堆。 </p>
+<p>写实复制技术利用了Linux的多级页表机制，在fork时拷贝的是父进程的页表，而不是物理内存页。在父子进程对页表进程修改时，才真正触发拷贝物理内存页。 </p>
+<p>实现上将页表设置成写保护，父子进程在尝试修改写保护的页面时，会引发缺页中断，内核会负责创建副本，也就是真正的拷贝。 </p>
+<p>文件描述符在fork的时候也发生了复制，但是复制的只是fdtable里保存的fd指针，因此父子进程还是共享fd。 </p>
+<p>复制过程略复杂，会设计到子进程初始化files_struct以及重新alloc_fdtable，最后将父进程的<strong>struct file类型指针</strong>拷贝到子进程对应的数据结构中。 </p>
+<p>为了避免暴露fd给子进程，Linux引入了close on exec机制。只要设置了FD_CLOSEXEC标志位的文件，在子进程调用exec时会将文件关闭。可以在open时设置这个flag，也可以在open后调用fcntl修改这个flag。建议在open时设置，因为可能在修改flag之前子进程已经被fork出来了。 </p>
+<p><strong>vfork父子进程共享内存</strong>。一般不要用vfork。 </p>
+<p>vfork创建的子进程不要用return退出，会有奇怪的bug。 </p>
+<p>daemon进程创建一般使用两次fork </p>
+<ol>
+<li><p>fork子进程，父进程退出 </p>
+</li>
+<li><p>子进程修改workdir, setsid, umask(0) </p>
+</li>
+<li><p>再次fork子进程，父进程退出。让daemon进程不是会话组的首进程，因为首进程可能打开终端设备 </p>
+</li>
+<li><p>关闭stderr, stdout, stdin </p>
+</li>
+</ol>
+<h1 id="exit和wait"><a href="#exit和wait" class="headerlink" title="exit和wait"></a>exit和wait</h1><p>退出有三种方式：_exit n,exit n, return n </p>
+<p>exit会处理用户定义的回调以及flush IO缓冲区，最后调用_exit </p>
+<p>return等于exit </p>
+<p>子进程退出后，pid和状态信息并不会立即释放掉。这样设计是为了记录一些进程运行过程中的状态。这样的进程就成为了<strong>僵尸进程</strong>。 </p>
+<p>当父进程调用wait给子进程收尸后，僵尸进程的资源才会释放掉。另外在子进程死掉的时候，会给父进程发送SIGCHLD信号，如果父进程回应一个SIG_IGN，那么子进程的pid和状态信息也会立即释放掉。 </p>
+<p>wait族函数有三个： </p>
+<ul>
+<li><p>wait阻塞父进程，获取任意一个退出的子进程的状态信息 </p>
+</li>
+<li><p>waitpid可以精确控制给哪一个pid/pgid的进程收尸，还可以设置为非阻塞，还可以获取子进程的暂停和继续的状态 </p>
+</li>
+<li><p>waitid是加强版waitpid，特色功能是可以只获取子进程的状态信息，而不会释放子进程的状态信息。wait和waitpid在获取后内核都会释放子进程的资源。 </p>
+</li>
+</ul>
+<h2 id="exit和wait的内核实现"><a href="#exit和wait的内核实现" class="headerlink" title="exit和wait的内核实现"></a>exit和wait的内核实现</h2><p>在进程退出以后，还有两件事情要做： </p>
+<ol>
+<li><p>作为父进程，需要为子进程寻找新的父进程 </p>
+</li>
+<li><p>作为子进程，需要通知父进程为自己收尸 </p>
+</li>
+</ol>
+<p>对于1来说，首先是寻找同一线程组中的其他线程作为新的父进程（假设是多线程下某个线程退出了），如果没找到，就交给init进程。父进程这时候也可以发送信号给子进程。 </p>
+<p>对于2来说，多线程下只有线程组主线程会通知父进程（或者主线程先退出了，线程组中最后一个线程也会通知父进程）。通知方式有两种：1.子进程可以发送SIGCHILD信号给父进程处理，父进程在信号处理函数中调用waitpid处理。2.父进程调用wait主动等待，将一个结构体加入到wait_childexit等待队列中。子进程在退出时会调用_wake_up_parent唤醒等待队列中的父进程。 </p>
+<h1 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h1><p>OS提供的系统调用是execve，原型是<code>int execve(cons char *path, char *const argv[], char *const envp[])</code> </p>
+<p>path是可执行文件路径，argv[]是参数数组。argv[0]一般设为可执行文件名，在获取参数时会跳过。evp是环境变量表。 </p>
+<p>glibc封装了6个函数，<strong>execl execle execlp execv execve execvp</strong> </p>
+<p>区别在于l代表参数是列表list(char *arg…)，v代表参数是数组vector(char *argv[])，p代表会自动解析PATH变量，e代表需要手动传入环境变量。 </p>
+<p>在内核实现上，首先会打开文件，然后把参数和环境变量复制到bprm中，然后在linux_bfmt链表中寻找可以执行该文件的解释器，如果找不到任何一个可用的解释器且没有动态加载的解释器，那么就报错。 </p>
+<p>常见的解释器有Linux的二进制文件ELF，脚本文件SCRIPT，用户自定义的MISC </p>
+<p>脚本开头的sheba标识也是在SCRIPT的解释器下寻找到真正的解释器，比如#!/usr/bin/env python </p>
+<p>可以自己在MISC下面注册新的解释器给OS，用magic number或者扩展名标识 </p>
+<p>exec后跟不会设置pid相关的值，但是信号处理会重置为SIG_DLF(除了SIG_IGN在Linux会保留) </p>
+<h1 id="system"><a href="#system" class="headerlink" title="system"></a>system</h1><p>可以使用system函数运行一条shell命令。过程是创建一个shell进程，然后在创建一个或多个命令进程。 </p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Linux </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Linux环境编程(0)-从应用到内核]]></title>
+      <url>/2019/10/11/Linux%E7%8E%AF%E5%A2%83%E7%BC%96%E7%A8%8B-0-%E4%BB%8E%E5%BA%94%E7%94%A8%E5%88%B0%E5%86%85%E6%A0%B8/</url>
+      <content type="html"><![CDATA[<p>编译的过程： </p>
+<p>预处理：替换宏 </p>
+<p>编译：将源代码编译成汇编 </p>
+<p>汇编：将汇编代码编译成二进制 </p>
+<p>链接：地址，so </p>
+<hr>
+<p>编译成的ELF文件内容： </p>
+<p>header信息 magic数 </p>
+<p>代码段 数据段 bss零值数据段 </p>
+<hr>
+<p>运行时：strace可以追踪程序的系统调用 </p>
+<p>加载ld.so </p>
+<p>加载glibc.so </p>
+<p>mmap将二进制映射到内存 </p>
+<p>执行main函数 </p>
+<hr>
+<p>glibc封装了系统调用，实现上基本是宏定义的汇编代码。因此用户并不需要关心自己写的代码是用户态还是内核态。系统调用的名字和参数通过寄存器传递。 </p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Linux </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Java多线程编程实战指南(8)-线程管理]]></title>
+      <url>/2019/10/11/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97-8-%E7%BA%BF%E7%A8%8B%E7%AE%A1%E7%90%86/</url>
+      <content type="html"><![CDATA[<h1 id="线程管理"><a href="#线程管理" class="headerlink" title="线程管理"></a>线程管理</h1><p>ThreadGroup是个隐含的概念，通常情况下不用管。</p>
+<p>uncaughtExceptionHandler可以用来处理线程的异常退出状态，比如实现线程退出重启。uncaughtExceptionHandler实例选择的优先级：本线程设置的handler &gt; 线程池handler &gt; 默认的handler。</p>
+<p>ThreadFactory用工厂模式来生产一组统一格式的线程，比如统一的线程名前缀、统一的uncaughtExceptionHandler。</p>
+<p>可以用condition的wait、signalAll实现已经被废弃的Thread.suspend()和Thread.resume()方法。</p>
+<p>线程池可以减少线程创建销毁的次数从而减少开销，同时更有效利用CPU资源。向线程池中提交Callable任务返回Future对象，future对象可以获取任务的执行结果、取消任务、判断任务是否执行。future对象还可以捕获线程池中线程的uncaughtException。<strong>如果线程池不再使用，记得调用shutdown/shutdownNow</strong>。executor对象有一些获取线程池状态的方法，据此可以监控线程池，也有beforeExecute和afterExecute回调可以在任务执行前后进行一些操作。对于线程池中线程的uncaughtExceptionHandler，只对通过executor.execute()方法提交的任务有效。<strong>同一线程池中不要提交有相互依赖关系的任务，会导致死锁。</strong></p>
+<h1 id="线程池工作流程"><a href="#线程池工作流程" class="headerlink" title="线程池工作流程"></a>线程池工作流程</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize, <span class="keyword">int</span> maxPoolSize, BlockingQueue&lt;Runnable&gt; bq, <span class="keyword">long</span> keepAliveTime, TimeUnit unit, ThreadFactory threadFactory, RejectedExecutionHandler handler)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>线程池在启动后，根据参数的prestartAllCoreThreads或者prestartCoreThread启动corePoolSize的线程或者启动一个线程。如果这两者都没有设定，那么就会新来一个task就创建一个线程，线程是由参数里的ThreadFactory创建的。</p>
+<p>当线程数量达到corePoolSize以后，新的task将会加入到参数中的BlockingQueue中，线程池中任务在执行完当前任务后，会尝试去BlockingQueue中取新的task(空闲线程回收也是在这一步完成的，具体见下面)。</p>
+<p>当BlockingQueue满了以后，线程池会继续创建新的线程直到maxPoolSize。如果线程数量达到maxPoolSize并且BlockingQueue也满了，线程池会执行拒绝策略，具体的拒绝策略依然由用户传入的参数决定，默认是直接丢弃。</p>
+<h1 id="线程池的空闲线程回收的细节"><a href="#线程池的空闲线程回收的细节" class="headerlink" title="线程池的空闲线程回收的细节"></a>线程池的空闲线程回收的细节</h1><p>空闲线程回收实际上在worker去getTask的时候实现的。如果是allowCoreThreadTimeOut或者当前线程数大于corePoolSize的情况下，会去尝试调用workQueue.poll(keepAliveTime)，否则调用workQueue.take()。poll在队列为空时会等待超时返回null，take会无限等待。poll或者take返回null时，会回收当前线程，这样就达到了等待keepAliveTime回收空闲线程的效果(也就是队列中没有新的task)。</p>
+<p>所以，<strong>只有在allowCoreThreadTimeOut或者当前线程数大于corePoolSize的情况下，才会回收空闲线程</strong>。也就是说，只有在设置allowCoreThreadTimeOut=true的情况下，才会回收corePoolSize的线程。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://objcoding.com/2019/04/14/threadpool-some-settings/" target="_blank" rel="noopener">关于初始化线程和核心线程是否会被回收</a></p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Airflow源码分析(4)-scheduler分析]]></title>
       <url>/2019/09/15/Airflow%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-4-scheduler%E5%88%86%E6%9E%90/</url>
       <content type="html"><![CDATA[<h2 id="scheduler的主循环"><a href="#scheduler的主循环" class="headerlink" title="scheduler的主循环"></a>scheduler的主循环</h2><p>scheduler的逻辑：</p>
@@ -813,6 +982,22 @@
         <tags>
             
             <tag> Python </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[李航《统计学习方法》代码实现]]></title>
+      <url>/2018/12/05/%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/</url>
+      <content type="html"><![CDATA[<p>学习《统计学习方法》时实现了一部分算法，整理在GitHub上</p>
+<p><a href="https://github.com/chace20/statistical-learning-method-code" target="_blank" rel="noopener">李航《统计学习方法》代码实现</a></p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> 机器学习 </tag>
             
         </tags>
         

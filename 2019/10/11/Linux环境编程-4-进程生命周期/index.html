@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>Linux环境编程(4)-进程生命周期 | chace</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Linux环境编程(4)-进程生命周期</h1><a id="logo" href="/.">chace</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Linux环境编程(4)-进程生命周期</h1><div class="post-meta">Oct 11, 2019<script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><div class="post-content"><h1 id="进程的层次关系"><a href="#进程的层次关系" class="headerlink" title="进程的层次关系"></a>进程的层次关系</h1><p>pid是进程ID，pgid是进程组ID，sid是会话ID。默认情况下，新创建的进程会继承父进程的进程组ID和会话ID。 </p>
+<p>比喻：会话是公司，进程组是部门，进程是员工。 </p>
+<p>进程组方便管理一组进程，比如发送信号可以发给一个进程组。 </p>
+<p>对于shell会话来说，登录时的进程为会话首进程。之后启动的进程分为前台进程组和后台进程组的概念。只有一个前台进程组，可以有多个后台进程组。前台进程组的进程在控制终端读取输入，比如ctrl+c </p>
+<h1 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h1><p>fork以后会用写时复制技术复制父进程的数据段、代码段、栈、堆。 </p>
+<p>写实复制技术利用了Linux的多级页表机制，在fork时拷贝的是父进程的页表，而不是物理内存页。在父子进程对页表进程修改时，才真正触发拷贝物理内存页。 </p>
+<p>实现上将页表设置成写保护，父子进程在尝试修改写保护的页面时，会引发缺页中断，内核会负责创建副本，也就是真正的拷贝。 </p>
+<p>文件描述符在fork的时候也发生了复制，但是复制的只是fdtable里保存的fd指针，因此父子进程还是共享fd。 </p>
+<p>复制过程略复杂，会设计到子进程初始化files_struct以及重新alloc_fdtable，最后将父进程的<strong>struct file类型指针</strong>拷贝到子进程对应的数据结构中。 </p>
+<p>为了避免暴露fd给子进程，Linux引入了close on exec机制。只要设置了FD_CLOSEXEC标志位的文件，在子进程调用exec时会将文件关闭。可以在open时设置这个flag，也可以在open后调用fcntl修改这个flag。建议在open时设置，因为可能在修改flag之前子进程已经被fork出来了。 </p>
+<p><strong>vfork父子进程共享内存</strong>。一般不要用vfork。 </p>
+<p>vfork创建的子进程不要用return退出，会有奇怪的bug。 </p>
+<p>daemon进程创建一般使用两次fork </p>
+<ol>
+<li><p>fork子进程，父进程退出 </p>
+</li>
+<li><p>子进程修改workdir, setsid, umask(0) </p>
+</li>
+<li><p>再次fork子进程，父进程退出。让daemon进程不是会话组的首进程，因为首进程可能打开终端设备 </p>
+</li>
+<li><p>关闭stderr, stdout, stdin </p>
+</li>
+</ol>
+<h1 id="exit和wait"><a href="#exit和wait" class="headerlink" title="exit和wait"></a>exit和wait</h1><p>退出有三种方式：_exit n,exit n, return n </p>
+<p>exit会处理用户定义的回调以及flush IO缓冲区，最后调用_exit </p>
+<p>return等于exit </p>
+<p>子进程退出后，pid和状态信息并不会立即释放掉。这样设计是为了记录一些进程运行过程中的状态。这样的进程就成为了<strong>僵尸进程</strong>。 </p>
+<p>当父进程调用wait给子进程收尸后，僵尸进程的资源才会释放掉。另外在子进程死掉的时候，会给父进程发送SIGCHLD信号，如果父进程回应一个SIG_IGN，那么子进程的pid和状态信息也会立即释放掉。 </p>
+<p>wait族函数有三个： </p>
+<ul>
+<li><p>wait阻塞父进程，获取任意一个退出的子进程的状态信息 </p>
+</li>
+<li><p>waitpid可以精确控制给哪一个pid/pgid的进程收尸，还可以设置为非阻塞，还可以获取子进程的暂停和继续的状态 </p>
+</li>
+<li><p>waitid是加强版waitpid，特色功能是可以只获取子进程的状态信息，而不会释放子进程的状态信息。wait和waitpid在获取后内核都会释放子进程的资源。 </p>
+</li>
+</ul>
+<h2 id="exit和wait的内核实现"><a href="#exit和wait的内核实现" class="headerlink" title="exit和wait的内核实现"></a>exit和wait的内核实现</h2><p>在进程退出以后，还有两件事情要做： </p>
+<ol>
+<li><p>作为父进程，需要为子进程寻找新的父进程 </p>
+</li>
+<li><p>作为子进程，需要通知父进程为自己收尸 </p>
+</li>
+</ol>
+<p>对于1来说，首先是寻找同一线程组中的其他线程作为新的父进程（假设是多线程下某个线程退出了），如果没找到，就交给init进程。父进程这时候也可以发送信号给子进程。 </p>
+<p>对于2来说，多线程下只有线程组主线程会通知父进程（或者主线程先退出了，线程组中最后一个线程也会通知父进程）。通知方式有两种：1.子进程可以发送SIGCHILD信号给父进程处理，父进程在信号处理函数中调用waitpid处理。2.父进程调用wait主动等待，将一个结构体加入到wait_childexit等待队列中。子进程在退出时会调用_wake_up_parent唤醒等待队列中的父进程。 </p>
+<h1 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h1><p>OS提供的系统调用是execve，原型是<code>int execve(cons char *path, char *const argv[], char *const envp[])</code> </p>
+<p>path是可执行文件路径，argv[]是参数数组。argv[0]一般设为可执行文件名，在获取参数时会跳过。evp是环境变量表。 </p>
+<p>glibc封装了6个函数，<strong>execl execle execlp execv execve execvp</strong> </p>
+<p>区别在于l代表参数是列表list(char *arg…)，v代表参数是数组vector(char *argv[])，p代表会自动解析PATH变量，e代表需要手动传入环境变量。 </p>
+<p>在内核实现上，首先会打开文件，然后把参数和环境变量复制到bprm中，然后在linux_bfmt链表中寻找可以执行该文件的解释器，如果找不到任何一个可用的解释器且没有动态加载的解释器，那么就报错。 </p>
+<p>常见的解释器有Linux的二进制文件ELF，脚本文件SCRIPT，用户自定义的MISC </p>
+<p>脚本开头的sheba标识也是在SCRIPT的解释器下寻找到真正的解释器，比如#!/usr/bin/env python </p>
+<p>可以自己在MISC下面注册新的解释器给OS，用magic number或者扩展名标识 </p>
+<p>exec后跟不会设置pid相关的值，但是信号处理会重置为SIG_DLF(除了SIG_IGN在Linux会保留) </p>
+<h1 id="system"><a href="#system" class="headerlink" title="system"></a>system</h1><p>可以使用system函数运行一条shell命令。过程是创建一个shell进程，然后在创建一个或多个命令进程。 </p>
+</div><div class="tags"><a href="/tags/Linux/">Linux</a></div><div class="post-nav"><a href="/2019/12/05/漫谈容器与容器云/" class="pre">漫谈容器与容器云</a><a href="/2019/10/11/Linux环境编程-0-从应用到内核/" class="next">Linux环境编程(0)-从应用到内核</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="search-form"><input id="local-search-input" placeholder="Search" type="text" name="q" results="0"><div id="local-search-result"></div></div></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/机器学习/" style="font-size: 15px;">机器学习</a> <a href="/tags/Airflow/" style="font-size: 15px;">Airflow</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/分布式系统/" style="font-size: 15px;">分布式系统</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/Python/" style="font-size: 15px;">Python</a> <a href="/tags/Go/" style="font-size: 15px;">Go</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/任务编排调度/" style="font-size: 15px;">任务编排调度</a> <a href="/tags/rabbitMQ/" style="font-size: 15px;">rabbitMQ</a> <a href="/tags/kubernetes/" style="font-size: 15px;">kubernetes</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/tools/" style="font-size: 15px;">tools</a> <a href="/tags/容器云/" style="font-size: 15px;">容器云</a> <a href="/tags/段子/" style="font-size: 15px;">段子</a> <a href="/tags/经验之谈/" style="font-size: 15px;">经验之谈</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/12/05/漫谈容器与容器云/">漫谈容器与容器云</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/11/Linux环境编程-4-进程生命周期/">Linux环境编程(4)-进程生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/11/Linux环境编程-0-从应用到内核/">Linux环境编程(0)-从应用到内核</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/11/Java多线程编程实战指南-8-线程管理/">Java多线程编程实战指南(8)-线程管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/15/Airflow源码分析-4-scheduler分析/">Airflow源码分析(4)-scheduler分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/leetcode题解-Best-Time-to-Buy-and-Sell-Stock/">LeetCode题解-Best Time to Buy and Sell Stock</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/02/k8s核心组件分析-scheduler/">k8s核心组件分析-scheduler</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/01/Docker架构分析/">Docker架构分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/01/Airflow源码分析(3)-jinja渲染部分/">Airflow源码分析(3)-jinja渲染部分</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/01/Airflow源码分析(2)-xcom部分/">Airflow源码分析(2)-xcom部分</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://blog.chionlab.moe/" title="ChionLab-未来道具研究所" target="_blank">ChionLab-未来道具研究所</a><ul></ul><a href="http://sinlapis.coding.me/" title="SinLapis的博客" target="_blank">SinLapis的博客</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">chace.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="/js/search.js?v=0.0.0"></script><script>var search_path = 'search.xml';
+if (search_path.length == 0) {
+   search_path = 'search.xml';
+}
+var path = '/' + search_path;
+searchFunc(path, 'local-search-input', 'local-search-result');
+</script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

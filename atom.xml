@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://chace.in/"/>
-  <updated>2019-09-16T09:40:39.950Z</updated>
+  <updated>2019-12-05T04:18:15.313Z</updated>
   <id>http://chace.in/</id>
   
   <author>
@@ -15,6 +15,112 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>漫谈容器与容器云</title>
+    <link href="http://chace.in/2019/12/05/%E6%BC%AB%E8%B0%88%E5%AE%B9%E5%99%A8%E4%B8%8E%E5%AE%B9%E5%99%A8%E4%BA%91/"/>
+    <id>http://chace.in/2019/12/05/漫谈容器与容器云/</id>
+    <published>2019-12-05T03:50:12.000Z</published>
+    <updated>2019-12-05T04:18:15.313Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="服务管理"><a href="#服务管理" class="headerlink" title="服务管理"></a>服务管理</h1><p>服务编排与部署</p><p>yaml</p><p>声明式部署</p><p>服务的调度</p><p>scheduler</p><p>服务高可用（健康检查、故障恢复）</p><p>kubelet</p><p>rc的重启</p><p>服务迁移</p><p>冷迁移</p><p>服务缩扩容</p><p>hpa, rc</p><p>服务发现与注册</p><p>service, endpoints</p><p>服务负载均衡</p><p>ingress, service</p><p>服务运行监控（监控、日志）</p><p>prometheus, fluentd</p><h1 id="资源管理"><a href="#资源管理" class="headerlink" title="资源管理"></a>资源管理</h1><p>计算</p><p>request， limits, resourceQuota</p><p>网络</p><p>二层网络 flannel</p><p>存储</p><p>pv, pvc, stroageclass</p><p>资源隔离</p><p>namespace</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;服务管理&quot;&gt;&lt;a href=&quot;#服务管理&quot; class=&quot;headerlink&quot; title=&quot;服务管理&quot;&gt;&lt;/a&gt;服务管理&lt;/h1&gt;&lt;p&gt;服务编排与部署&lt;/p&gt;
+&lt;p&gt;yaml&lt;/p&gt;
+&lt;p&gt;声明式部署&lt;/p&gt;
+&lt;p&gt;服务的调度&lt;/p&gt;
+&lt;p&gt;scheduler
+      
+    
+    </summary>
+    
+    
+      <category term="Docker" scheme="http://chace.in/tags/Docker/"/>
+    
+      <category term="容器云" scheme="http://chace.in/tags/%E5%AE%B9%E5%99%A8%E4%BA%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux环境编程(4)-进程生命周期</title>
+    <link href="http://chace.in/2019/10/11/Linux%E7%8E%AF%E5%A2%83%E7%BC%96%E7%A8%8B-4-%E8%BF%9B%E7%A8%8B%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/"/>
+    <id>http://chace.in/2019/10/11/Linux环境编程-4-进程生命周期/</id>
+    <published>2019-10-11T14:06:48.000Z</published>
+    <updated>2019-10-11T14:10:20.964Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="进程的层次关系"><a href="#进程的层次关系" class="headerlink" title="进程的层次关系"></a>进程的层次关系</h1><p>pid是进程ID，pgid是进程组ID，sid是会话ID。默认情况下，新创建的进程会继承父进程的进程组ID和会话ID。 </p><p>比喻：会话是公司，进程组是部门，进程是员工。 </p><p>进程组方便管理一组进程，比如发送信号可以发给一个进程组。 </p><p>对于shell会话来说，登录时的进程为会话首进程。之后启动的进程分为前台进程组和后台进程组的概念。只有一个前台进程组，可以有多个后台进程组。前台进程组的进程在控制终端读取输入，比如ctrl+c </p><h1 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h1><p>fork以后会用写时复制技术复制父进程的数据段、代码段、栈、堆。 </p><p>写实复制技术利用了Linux的多级页表机制，在fork时拷贝的是父进程的页表，而不是物理内存页。在父子进程对页表进程修改时，才真正触发拷贝物理内存页。 </p><p>实现上将页表设置成写保护，父子进程在尝试修改写保护的页面时，会引发缺页中断，内核会负责创建副本，也就是真正的拷贝。 </p><p>文件描述符在fork的时候也发生了复制，但是复制的只是fdtable里保存的fd指针，因此父子进程还是共享fd。 </p><p>复制过程略复杂，会设计到子进程初始化files_struct以及重新alloc_fdtable，最后将父进程的<strong>struct file类型指针</strong>拷贝到子进程对应的数据结构中。 </p><p>为了避免暴露fd给子进程，Linux引入了close on exec机制。只要设置了FD_CLOSEXEC标志位的文件，在子进程调用exec时会将文件关闭。可以在open时设置这个flag，也可以在open后调用fcntl修改这个flag。建议在open时设置，因为可能在修改flag之前子进程已经被fork出来了。 </p><p><strong>vfork父子进程共享内存</strong>。一般不要用vfork。 </p><p>vfork创建的子进程不要用return退出，会有奇怪的bug。 </p><p>daemon进程创建一般使用两次fork </p><ol><li><p>fork子进程，父进程退出 </p></li><li><p>子进程修改workdir, setsid, umask(0) </p></li><li><p>再次fork子进程，父进程退出。让daemon进程不是会话组的首进程，因为首进程可能打开终端设备 </p></li><li><p>关闭stderr, stdout, stdin </p></li></ol><h1 id="exit和wait"><a href="#exit和wait" class="headerlink" title="exit和wait"></a>exit和wait</h1><p>退出有三种方式：_exit n,exit n, return n </p><p>exit会处理用户定义的回调以及flush IO缓冲区，最后调用_exit </p><p>return等于exit </p><p>子进程退出后，pid和状态信息并不会立即释放掉。这样设计是为了记录一些进程运行过程中的状态。这样的进程就成为了<strong>僵尸进程</strong>。 </p><p>当父进程调用wait给子进程收尸后，僵尸进程的资源才会释放掉。另外在子进程死掉的时候，会给父进程发送SIGCHLD信号，如果父进程回应一个SIG_IGN，那么子进程的pid和状态信息也会立即释放掉。 </p><p>wait族函数有三个： </p><ul><li><p>wait阻塞父进程，获取任意一个退出的子进程的状态信息 </p></li><li><p>waitpid可以精确控制给哪一个pid/pgid的进程收尸，还可以设置为非阻塞，还可以获取子进程的暂停和继续的状态 </p></li><li><p>waitid是加强版waitpid，特色功能是可以只获取子进程的状态信息，而不会释放子进程的状态信息。wait和waitpid在获取后内核都会释放子进程的资源。 </p></li></ul><h2 id="exit和wait的内核实现"><a href="#exit和wait的内核实现" class="headerlink" title="exit和wait的内核实现"></a>exit和wait的内核实现</h2><p>在进程退出以后，还有两件事情要做： </p><ol><li><p>作为父进程，需要为子进程寻找新的父进程 </p></li><li><p>作为子进程，需要通知父进程为自己收尸 </p></li></ol><p>对于1来说，首先是寻找同一线程组中的其他线程作为新的父进程（假设是多线程下某个线程退出了），如果没找到，就交给init进程。父进程这时候也可以发送信号给子进程。 </p><p>对于2来说，多线程下只有线程组主线程会通知父进程（或者主线程先退出了，线程组中最后一个线程也会通知父进程）。通知方式有两种：1.子进程可以发送SIGCHILD信号给父进程处理，父进程在信号处理函数中调用waitpid处理。2.父进程调用wait主动等待，将一个结构体加入到wait_childexit等待队列中。子进程在退出时会调用_wake_up_parent唤醒等待队列中的父进程。 </p><h1 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h1><p>OS提供的系统调用是execve，原型是<code>int execve(cons char *path, char *const argv[], char *const envp[])</code> </p><p>path是可执行文件路径，argv[]是参数数组。argv[0]一般设为可执行文件名，在获取参数时会跳过。evp是环境变量表。 </p><p>glibc封装了6个函数，<strong>execl execle execlp execv execve execvp</strong> </p><p>区别在于l代表参数是列表list(char *arg…)，v代表参数是数组vector(char *argv[])，p代表会自动解析PATH变量，e代表需要手动传入环境变量。 </p><p>在内核实现上，首先会打开文件，然后把参数和环境变量复制到bprm中，然后在linux_bfmt链表中寻找可以执行该文件的解释器，如果找不到任何一个可用的解释器且没有动态加载的解释器，那么就报错。 </p><p>常见的解释器有Linux的二进制文件ELF，脚本文件SCRIPT，用户自定义的MISC </p><p>脚本开头的sheba标识也是在SCRIPT的解释器下寻找到真正的解释器，比如#!/usr/bin/env python </p><p>可以自己在MISC下面注册新的解释器给OS，用magic number或者扩展名标识 </p><p>exec后跟不会设置pid相关的值，但是信号处理会重置为SIG_DLF(除了SIG_IGN在Linux会保留) </p><h1 id="system"><a href="#system" class="headerlink" title="system"></a>system</h1><p>可以使用system函数运行一条shell命令。过程是创建一个shell进程，然后在创建一个或多个命令进程。 </p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;进程的层次关系&quot;&gt;&lt;a href=&quot;#进程的层次关系&quot; class=&quot;headerlink&quot; title=&quot;进程的层次关系&quot;&gt;&lt;/a&gt;进程的层次关系&lt;/h1&gt;&lt;p&gt;pid是进程ID，pgid是进程组ID，sid是会话ID。默认情况下，新创建的进程会继承父进程的进程
+      
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="http://chace.in/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux环境编程(0)-从应用到内核</title>
+    <link href="http://chace.in/2019/10/11/Linux%E7%8E%AF%E5%A2%83%E7%BC%96%E7%A8%8B-0-%E4%BB%8E%E5%BA%94%E7%94%A8%E5%88%B0%E5%86%85%E6%A0%B8/"/>
+    <id>http://chace.in/2019/10/11/Linux环境编程-0-从应用到内核/</id>
+    <published>2019-10-11T14:06:27.000Z</published>
+    <updated>2019-10-12T01:57:03.845Z</updated>
+    
+    <content type="html"><![CDATA[<p>编译的过程： </p><p>预处理：替换宏 </p><p>编译：将源代码编译成汇编 </p><p>汇编：将汇编代码编译成二进制 </p><p>链接：地址，so </p><hr><p>编译成的ELF文件内容： </p><p>header信息 magic数 </p><p>代码段 数据段 bss零值数据段 </p><hr><p>运行时：strace可以追踪程序的系统调用 </p><p>加载ld.so </p><p>加载glibc.so </p><p>mmap将二进制映射到内存 </p><p>执行main函数 </p><hr><p>glibc封装了系统调用，实现上基本是宏定义的汇编代码。因此用户并不需要关心自己写的代码是用户态还是内核态。系统调用的名字和参数通过寄存器传递。 </p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;编译的过程： &lt;/p&gt;
+&lt;p&gt;预处理：替换宏 &lt;/p&gt;
+&lt;p&gt;编译：将源代码编译成汇编 &lt;/p&gt;
+&lt;p&gt;汇编：将汇编代码编译成二进制 &lt;/p&gt;
+&lt;p&gt;链接：地址，so &lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;编译成的ELF文件内容： &lt;/p&gt;
+&lt;p&gt;header信息 magic数 &lt;/p
+      
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="http://chace.in/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java多线程编程实战指南(8)-线程管理</title>
+    <link href="http://chace.in/2019/10/11/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98%E6%8C%87%E5%8D%97-8-%E7%BA%BF%E7%A8%8B%E7%AE%A1%E7%90%86/"/>
+    <id>http://chace.in/2019/10/11/Java多线程编程实战指南-8-线程管理/</id>
+    <published>2019-10-11T13:23:17.000Z</published>
+    <updated>2019-10-12T01:56:01.387Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="线程管理"><a href="#线程管理" class="headerlink" title="线程管理"></a>线程管理</h1><p>ThreadGroup是个隐含的概念，通常情况下不用管。</p><p>uncaughtExceptionHandler可以用来处理线程的异常退出状态，比如实现线程退出重启。uncaughtExceptionHandler实例选择的优先级：本线程设置的handler &gt; 线程池handler &gt; 默认的handler。</p><p>ThreadFactory用工厂模式来生产一组统一格式的线程，比如统一的线程名前缀、统一的uncaughtExceptionHandler。</p><p>可以用condition的wait、signalAll实现已经被废弃的Thread.suspend()和Thread.resume()方法。</p><p>线程池可以减少线程创建销毁的次数从而减少开销，同时更有效利用CPU资源。向线程池中提交Callable任务返回Future对象，future对象可以获取任务的执行结果、取消任务、判断任务是否执行。future对象还可以捕获线程池中线程的uncaughtException。<strong>如果线程池不再使用，记得调用shutdown/shutdownNow</strong>。executor对象有一些获取线程池状态的方法，据此可以监控线程池，也有beforeExecute和afterExecute回调可以在任务执行前后进行一些操作。对于线程池中线程的uncaughtExceptionHandler，只对通过executor.execute()方法提交的任务有效。<strong>同一线程池中不要提交有相互依赖关系的任务，会导致死锁。</strong></p><h1 id="线程池工作流程"><a href="#线程池工作流程" class="headerlink" title="线程池工作流程"></a>线程池工作流程</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize, <span class="keyword">int</span> maxPoolSize, BlockingQueue&lt;Runnable&gt; bq, <span class="keyword">long</span> keepAliveTime, TimeUnit unit, ThreadFactory threadFactory, RejectedExecutionHandler handler)</span></span>;</span><br></pre></td></tr></table></figure><p>线程池在启动后，根据参数的prestartAllCoreThreads或者prestartCoreThread启动corePoolSize的线程或者启动一个线程。如果这两者都没有设定，那么就会新来一个task就创建一个线程，线程是由参数里的ThreadFactory创建的。</p><p>当线程数量达到corePoolSize以后，新的task将会加入到参数中的BlockingQueue中，线程池中任务在执行完当前任务后，会尝试去BlockingQueue中取新的task(空闲线程回收也是在这一步完成的，具体见下面)。</p><p>当BlockingQueue满了以后，线程池会继续创建新的线程直到maxPoolSize。如果线程数量达到maxPoolSize并且BlockingQueue也满了，线程池会执行拒绝策略，具体的拒绝策略依然由用户传入的参数决定，默认是直接丢弃。</p><h1 id="线程池的空闲线程回收的细节"><a href="#线程池的空闲线程回收的细节" class="headerlink" title="线程池的空闲线程回收的细节"></a>线程池的空闲线程回收的细节</h1><p>空闲线程回收实际上在worker去getTask的时候实现的。如果是allowCoreThreadTimeOut或者当前线程数大于corePoolSize的情况下，会去尝试调用workQueue.poll(keepAliveTime)，否则调用workQueue.take()。poll在队列为空时会等待超时返回null，take会无限等待。poll或者take返回null时，会回收当前线程，这样就达到了等待keepAliveTime回收空闲线程的效果(也就是队列中没有新的task)。</p><p>所以，<strong>只有在allowCoreThreadTimeOut或者当前线程数大于corePoolSize的情况下，才会回收空闲线程</strong>。也就是说，只有在设置allowCoreThreadTimeOut=true的情况下，才会回收corePoolSize的线程。</p><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://objcoding.com/2019/04/14/threadpool-some-settings/" target="_blank" rel="noopener">关于初始化线程和核心线程是否会被回收</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;线程管理&quot;&gt;&lt;a href=&quot;#线程管理&quot; class=&quot;headerlink&quot; title=&quot;线程管理&quot;&gt;&lt;/a&gt;线程管理&lt;/h1&gt;&lt;p&gt;ThreadGroup是个隐含的概念，通常情况下不用管。&lt;/p&gt;
+&lt;p&gt;uncaughtExceptionHandler可以
+      
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://chace.in/tags/Java/"/>
+    
+  </entry>
   
   <entry>
     <title>Airflow源码分析(4)-scheduler分析</title>
@@ -405,99 +511,6 @@
     
     
       <category term="Go" scheme="http://chace.in/tags/Go/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>CS6.824(1)-mapreduce</title>
-    <link href="http://chace.in/2019/05/15/CS6.824(1)-mapreduce/"/>
-    <id>http://chace.in/2019/05/15/CS6.824(1)-mapreduce/</id>
-    <published>2019-05-15T12:48:00.000Z</published>
-    <updated>2019-05-15T13:37:15.661Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>master: 获取Job信息，决定mapper和reducer个数，并分割文件。同时接收来自worker的注册，根据一定策略调度task给可用的worker，并进行出错处理。</p><p>worker: 执行具体的mapper或者reducer。</p><p>map阶段: map(k1, v1) -&gt; list(k2, v2)</p><p>reduce阶段: reduce(k2, list(v2)) -&gt; list(k2, v3)</p><h2 id="Mapper"><a href="#Mapper" class="headerlink" title="Mapper"></a>Mapper</h2><p>Mapper读取master分配给自己的一份小文件，调用用户定义的map函数处理文件内容，map函数会返回一个key-value列表。</p><p>对于所有的key，mapper会计算其hash值并跟reducer个数取模，这样就完成了partition的过程，这个过程主要是为了将key分散到不同的reducer中。</p><p>对于上面的每一个partition，mapper会生成一个文件，将属于其的key-value对列表写入到该文件中。为了方便，序列化为JSON格式。在reduce阶段，reducer会从多个mapper生成的文件中读取分配给自己的文件。</p><h2 id="Reducer"><a href="#Reducer" class="headerlink" title="Reducer"></a>Reducer</h2><p>Reducer从map阶段生成的文件中读取分配给自己的文件，反序列化为key-value对列表。接下来，Reducer需要完成根据key来分组的过程。</p><p>这个过程可以用hashmap来实现，也可以用排序来实现。因为考虑到文件会很大，在内存中保存这样一个hashmap消耗很大。这里使用排序来实现。对于key-value对列表，调用排序函数根据key进行排序。排序完成后，只要发现下一个key跟上一个key不一样，就可以判断在这里是两个组的分割点，上一个分割点到这一个分割点中间的数据就是同一个key的列表。</p><p>分组完成后，调用用户定义的reduce函数处理每一个key及其value列表，reduce函数返回一个字符串，代表这个key规约的结果。</p><p>最后将key以及key规约的结果序列化成JSON格式，写入到reduce输出的文件中。</p><p>之后还会有merge的阶段，将多个reducer生成的文件合并成一个完整文件，作为MapReduce最终的输出结果。</p><h2 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h2><p>master启动一个RPC服务器，用来接收worker的注册。worker通过RPC注册到master后，master会将worker的信息发送给registerChan。Scheduler从registerChan中接收注册的worker，加入到idleWorkerChan中。这个过程是在一个go程里循环读取的。</p><p>在map阶段或者reduce阶段，对于所有的task，首先将所有task放入到taskChan中，之后循环从这个taskChan中获取一个task，然后启动一个go程，在这个go程里从idleWorkerChan中获取一个worker，把这个task通过rpc的方式交给这个worker去执行。</p><p>在这里简化了worker崩溃的判断，只要rpc调用失败就认为worker崩溃，这个时候将task放回到taskChan中。如果rpc调用成功，则将worker放入idleWorkerChan中，使得其可以重新被调度。</p><p>当所有task执行完毕后，主线程会收到一个通知，跳出循环，结束该阶段的任务。</p><h2 id="容错"><a href="#容错" class="headerlink" title="容错"></a>容错</h2><p>因为只有当map阶段的任务完成以后才会开始执行reduce任务，只有当reduce阶段任务全部完成后才会开始执行merge，因此保证了map操作跟reduce操作具有原子性。也就是说，map(reduce)的输出文件要么不可用，要么就是完整的。下一阶段的task不会读取到不一致的数据。</p><p>map跟reduce操作都是幂等的，也就是多次重复执行产生的结果一直，这也是上述在worker失败时，schedule可以将task放回到taskChan中重新执行的背后原理。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;整体架构&quot;&gt;&lt;a href=&quot;#整体架构&quot; class=&quot;headerlink&quot; title=&quot;整体架构&quot;&gt;&lt;/a&gt;整体架构&lt;/h2&gt;&lt;p&gt;master: 获取Job信息，决定mapper和reducer个数，并分割文件。同时接收来自worker的注册，根据一定策
-      
-    
-    </summary>
-    
-    
-      <category term="分布式系统" scheme="http://chace.in/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Fluent Python(17-18)——并发</title>
-    <link href="http://chace.in/2019/03/11/Fluent%20Python(17-18)%E2%80%94%E2%80%94%E5%B9%B6%E5%8F%91/"/>
-    <id>http://chace.in/2019/03/11/Fluent Python(17-18)——并发/</id>
-    <published>2019-03-11T12:30:04.000Z</published>
-    <updated>2019-05-01T04:44:04.300Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="17-concurrent处理多进程和多线程"><a href="#17-concurrent处理多进程和多线程" class="headerlink" title="17. concurrent处理多进程和多线程"></a>17. concurrent处理多进程和多线程</h1><h2 id="两种方式"><a href="#两种方式" class="headerlink" title="两种方式"></a>两种方式</h2><ol><li>线程池和进程池：ThreadPoolExecutor和ProcessPoolExecutor</li><li>ThreadPoolExecutor.map(func, list_of_param)返回生成器，获取各个函数返回的值。获取返回值时会<strong>阻塞</strong>，返回结果的顺序与调用的顺序一致。</li><li>ThreadPoolExecutor.submit(func, param)返回future对象，futures.as_completed(list_of_future)返回迭代器，在任一future运行结束后产出future。之后可以使用future.result()获取结果，这样可以<strong>不阻塞</strong>。</li><li>另一种方式是future.add_done_callback(callback)</li></ol><p>as_completed()内部实现<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将调用as_completed之前已经完成的future直接yield</span></span><br><span class="line"><span class="keyword">yield</span> <span class="keyword">from</span> finished</span><br><span class="line"><span class="comment"># 死循环</span></span><br><span class="line"><span class="keyword">while</span> pending:</span><br><span class="line">    <span class="keyword">if</span> timeout <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        wait_timeout = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        wait_timeout = end_time - time.time()</span><br><span class="line">        <span class="keyword">if</span> wait_timeout &lt; <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">raise</span> TimeoutError(</span><br><span class="line">                    <span class="string">'%d (of %d) futures unfinished'</span> % (</span><br><span class="line">                    len(pending), len(fs)))</span><br><span class="line">    <span class="comment"># 阻塞等待有没有future完成</span></span><br><span class="line">    waiter.event.wait(wait_timeout)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> waiter.lock:</span><br><span class="line">        finished = waiter.finished_futures</span><br><span class="line">        waiter.finished_futures = []</span><br><span class="line">        waiter.event.clear()</span><br><span class="line">    <span class="comment"># 每当有完成的future时，yield future</span></span><br><span class="line">    <span class="keyword">for</span> future <span class="keyword">in</span> finished:</span><br><span class="line">        <span class="keyword">yield</span> future</span><br><span class="line">        pending.remove(future)</span><br></pre></td></tr></table></figure></p><h2 id="性能相关"><a href="#性能相关" class="headerlink" title="性能相关"></a>性能相关</h2><ol><li>CPython解释器本身不是线程安全的，因此有GIL，一次只允许一个线程执行Python字节码。</li><li>标准库中阻塞性IO操作在等待系统返回结果时会释放GIL，因此IO密集型操作可以用多线程并发；time.sleep()也会释放GIL实现并发。</li><li>CPU密集型操作使用多进程并发。</li><li>PyPy虽然没有释放GIL，但是因为有JIL，在CPU密集型工作时比CPython快。</li></ol><h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><p>注意：with块结束后主程序才会继续往下执行，或者显式地调用executor.shutdown(wait=False)不等待继续执行。</p><p>shutdown(wait=True)的含义：</p><p>Signal the executor that it should free any resources that it is using when the currently pending futures are done executing.</p><p>所以调用shutdown并不会中断当前进程池中的future，只是通知future执行完毕后释放资源。</p><h1 id="18-asyncio协程处理并发"><a href="#18-asyncio协程处理并发" class="headerlink" title="18. asyncio协程处理并发"></a>18. asyncio协程处理并发</h1><h2 id="yield-from-await的概念"><a href="#yield-from-await的概念" class="headerlink" title="yield from/await的概念"></a>yield from/await的概念</h2><p>在调用方-委派生成器-子生成器模型中：<br>在gen中使用yield from subgen()时，subgen获得控制权，把产出的值传给gen的调用方。gen会阻塞，等待subgen()产出值。<br>yield from的主要功能是打开双向通道，把最外层的调用方与最内层的子生成器连接起来，这样二者可以直接发送(send)和产出(yield)值。（在Python 3.5以上，可以使用await代替yield from，更容易理解）<br>假设yield from出现在委派生成器中，客户端代码驱动着委派生成器，而委派生成器驱动着子生成器。</p><p>asyncio中：<br>可以这样理解，yield from跟普通调用的区别就在于不会阻塞事件循环。类似于epoll。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 不会阻塞事件循环，因为当调用了yield from以后，控制权就回到事件循环手中了。</span></span><br><span class="line">resp = <span class="keyword">yield</span> <span class="keyword">from</span> aiohttp.request(<span class="string">'GET'</span>, url)</span><br><span class="line"><span class="comment"># resp = await aiohttp.request('GET', url) 用await更容易理解</span></span><br><span class="line"><span class="comment"># 会阻塞主线程</span></span><br><span class="line">resp = aiohttp.request(<span class="string">'GET'</span>, url)</span><br></pre></td></tr></table></figure></p><p>yield from的用法：</p><ol><li>在yield from链接的多个协程最终必须由不是协程的调用方驱动，调用方显示或隐式在最外层委派生成器上调用next(…)或.send(…)。</li><li>链条中最内层的子生成器必须是简单生成器(yield)或可迭代对象。</li></ol><p>在asyncio中：<br>我们编写的协程链条始终通过把最外层委派生成器传给asyncio包API中的某个函数(如loop.run_until_complete(…))驱动。也就是说，调用next(…)或者send(…)的操作由asyncio的事件循环完成。</p><p>概括起来：使用asyncio包时，使用yield from架起管道，让asyncio的事件循环(通过我们编写的协程)，驱动执行底层异步IO操作的库函数。</p><h2 id="使用asyncio的步骤"><a href="#使用asyncio的步骤" class="headerlink" title="使用asyncio的步骤"></a>使用asyncio的步骤</h2><h3 id="1-创建task-可选"><a href="#1-创建task-可选" class="headerlink" title="1. 创建task(可选)"></a>1. 创建task(可选)</h3><p>创建单个task：</p><ul><li>asyncio.async(…)</li><li>BaseEventLoop.create_task(…)</li></ul><p>创建多个task:</p><ul><li>asyncio.wait(coros)  全部协程执行完毕后返回结果</li><li>asyncio.as_completed(coros)  返回一个生成器，当有协程完成时就迭代</li></ul><h3 id="2-获取事件循环"><a href="#2-获取事件循环" class="headerlink" title="2. 获取事件循环"></a>2. 获取事件循环</h3><p>loop = asyncio.get_event_loop()</p><h3 id="3-将task-s-或者coro加入到事件循环中"><a href="#3-将task-s-或者coro加入到事件循环中" class="headerlink" title="3. 将task(s)或者coro加入到事件循环中"></a>3. 将task(s)或者coro加入到事件循环中</h3><ul><li>loop.run_until_complete(coro/task)   普通运行loop</li><li>loop.run_in_executor(coro/task)   在ThreadPoolExecutor中运行loop</li></ul><p><strong>需要注意的是，第1步不是必须的，如果在第3步中传入的是协程而不是task，那么run_until_complete()会将协程包装成task，之所以用第1步，是为了持有task对象，方便对协程进行操作，比如获取完成的task的result、task.cancel()等。</strong></p><p>至于协程本身的定义，内部使用yield from关键字，函数使用@asyncio.coroutine装饰。</p><p><strong>对于Python 3.5以上，内部使用await代替yield from，函数使用async def func()</strong>，语义更加明确。</p><h3 id="异步IO的事件循环示例："><a href="#异步IO的事件循环示例：" class="headerlink" title="异步IO的事件循环示例："></a>异步IO的事件循环示例：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'Hello world! (%s)'</span> % threading.currentThread())</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">'Hello again! (%s)'</span> % threading.currentThread())</span><br><span class="line"></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">tasks = [hello(), hello()]</span><br><span class="line">loop.run_until_complete(asyncio.wait(tasks))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure><p>执行结果:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Hello world! (&lt;_MainThread(MainThread, started 140735195337472)&gt;)</span><br><span class="line">Hello world! (&lt;_MainThread(MainThread, started 140735195337472)&gt;)</span><br><span class="line">(暂停约1秒)</span><br><span class="line">Hello again! (&lt;_MainThread(MainThread, started 140735195337472)&gt;)</span><br><span class="line">Hello again! (&lt;_MainThread(MainThread, started 140735195337472)&gt;)</span><br></pre></td></tr></table></figure></p><p>可以看到，两个协程并发执行，但是是在同一个线程里完成的，中间并没有发生阻塞。也就是说，当协程运行到await asyncio.sleep(1)时，控制权会交换给事件循环，事件循环会去继续执行其他协程，中间不会阻塞。</p><h3 id="基于异步IO的HTTP服务器"><a href="#基于异步IO的HTTP服务器" class="headerlink" title="基于异步IO的HTTP服务器"></a>基于异步IO的HTTP服务器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">from</span> aiohttp <span class="keyword">import</span> web</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(<span class="string">'Receive: &#123;&#125;'</span>.format(request))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">0.5</span>)</span><br><span class="line">    <span class="keyword">return</span> web.Response(content_type=<span class="string">'text/html'</span>, text=<span class="string">'&lt;h1&gt;Index&lt;/h1&gt;'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(request)</span>:</span></span><br><span class="line">    print(<span class="string">'Receive: &#123;&#125;'</span>.format(request))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">0.5</span>)</span><br><span class="line">    text = <span class="string">'&lt;h1&gt;hello, %s!&lt;/h1&gt;'</span> % request.match_info[<span class="string">'name'</span>]</span><br><span class="line">    <span class="keyword">return</span> web.Response(content_type=<span class="string">'text/html'</span>, text=text)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">init</span><span class="params">(loop, address, port)</span>:</span></span><br><span class="line">    app = web.Application(loop=loop)</span><br><span class="line">    app.router.add_route(<span class="string">'GET'</span>, <span class="string">'/'</span>, index)</span><br><span class="line">    app.router.add_route(<span class="string">'GET'</span>, <span class="string">'/hello/&#123;name&#125;'</span>, hello)</span><br><span class="line">    srv = <span class="keyword">await</span> loop.create_server(app.make_handler(), address, port)</span><br><span class="line">    print(<span class="string">'Server started at http://&#123;&#125;:&#123;&#125;...'</span>.format(address, port))</span><br><span class="line">    <span class="keyword">return</span> srv</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(address=<span class="string">'127.0.0.1'</span>, port=<span class="number">8888</span>)</span>:</span></span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    <span class="comment"># 注意观察这里的srv，其实是协程init结束后的返回值</span></span><br><span class="line">    srv = loop.run_until_complete(init(loop, address, port))</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        loop.run_forever()</span><br><span class="line">    <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    print(<span class="string">'Server &#123;&#125; shutting down.'</span>.format(srv))</span><br><span class="line">    loop.close()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main(*sys.argv[<span class="number">1</span>:])</span><br></pre></td></tr></table></figure><h1 id="Python并发总结"><a href="#Python并发总结" class="headerlink" title="Python并发总结"></a>Python并发总结</h1><p>协程的底层还是基于事件循环，类似于IO多路复用这种方式，让单线程可以实现并发。</p><p>并发的实现依赖于协程的不阻塞，所以协程最后的操作要使用非阻塞操作(比如asyncio.sleep(0.5)是非阻塞的，或者一些asyncio的网络IO操作)才能发挥作用，否则就跟顺序执行一样了。如果必须要使用阻塞的操作，可以使用<code>loop.run_in_executor</code>在线程池中使用多个loop。</p><p>asyncio实现并发的流程：主线程持有一个事件循环loop，会去调度加入到事件循环中的协程并调度执行，当协程进行异步操作的时候，控制权回到事件循环，事件循环再去调度其他协程执行。当暂停的协程返回时，事件循环再去调度其执行。因而实现了并发，跟IO多路复用很像。</p><p>协程跟多线程相比优势：</p><ol><li>没有切换线程的开销</li><li>不用处理锁</li><li>由用户决定协程的调度（通过send()激活，yield暂停）</li></ol><p>协程跟多线程相比劣势：</p><ol><li>执行的操作必须是异步操作，否则就没有调度的意义</li><li>无论怎么说，只有一个线程，没法使用到多核CPU。(Go语言好像解决了这个问题)</li></ol><p>总结来说，并发的实现可以基于三种方式：</p><ol><li>多进程</li><li>多线程</li><li>基于事件循环的异步IO</li></ol><p>而对于3来说，目前主流语言有两种实现方式：1.回调 2.协程。NodeJS里使用的是回调，而Python使用的是协程。</p><p>与回调相比，协程的优势在于：</p><ol><li>不会陷入多层回调嵌套，那样代码是复杂且难以阅读的。</li><li>协程可以在中断处保存上下文，下次继续执行时可以恢复，因而不需要再去单独把中间结果保存到全局或者其他地方（回调中必须这样做）。</li></ol><h2 id="使用场景总结"><a href="#使用场景总结" class="headerlink" title="使用场景总结"></a>使用场景总结</h2><p>计算密集型使用多进程。这样可以用到多核CPU。</p><p>异步IO密集型可以使用协程，然后用线程池创建多个event_loop可以辅助提高性能；</p><p>同步IO密集型使用多线程。Python因为有GIL锁，其实多线程并不能利用多核CPU实现<strong>并行</strong>。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;17-concurrent处理多进程和多线程&quot;&gt;&lt;a href=&quot;#17-concurrent处理多进程和多线程&quot; class=&quot;headerlink&quot; title=&quot;17. concurrent处理多进程和多线程&quot;&gt;&lt;/a&gt;17. concurrent处理多进程
-      
-    
-    </summary>
-    
-    
-      <category term="Python" scheme="http://chace.in/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Fluent Python(14-16)——从迭代器到协程</title>
-    <link href="http://chace.in/2019/03/03/Fluent%20Python(14-16)%E2%80%94%E2%80%94%E8%BF%AD%E4%BB%A3%E5%99%A8/"/>
-    <id>http://chace.in/2019/03/03/Fluent Python(14-16)——迭代器/</id>
-    <published>2019-03-03T07:22:04.000Z</published>
-    <updated>2019-04-29T03:32:43.603Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="14-迭代器与生成器"><a href="#14-迭代器与生成器" class="headerlink" title="14. 迭代器与生成器"></a>14. 迭代器与生成器</h1><ol><li><p><strong>可迭代的对象</strong>：使用iter内置函数可以获取迭代器的对象。如果对象实现了<code>__iter__</code>方法，能够返回一个迭代器，那么对象就是可迭代的。</p></li><li><p><strong>迭代器</strong>：对象实现了<code>__next__</code>返回序列中的下一个元素。迭代器还实现了<code>__iter__</code>返回self，因此迭代器也可以迭代。</p></li><li><p><strong>生成器函数</strong>：函数的定义体中有<code>yield</code>关键字，该函数就是生成器函数。调用生成器函数时，会返回一个生成器对象。也就是说，生成器函数是生成器工厂。</p></li><li><p><strong>关系</strong>：所有的生成器都是迭代器，因为生成器完全实现了迭代器接口。生成器只是另一种实现可迭代对象的方式而已。除了会创建和保存程序状态，当生成器终结时，还会自动抛出StopIteration异常。</p></li></ol><h1 id="15-上下文管理器和with块"><a href="#15-上下文管理器和with块" class="headerlink" title="15. 上下文管理器和with块"></a>15. 上下文管理器和with块</h1><ol><li><p>else可以用在for, while, try的后面，循环体正常执行完毕（没有break, 没有except）后退出时执行else的内容。</p></li><li><p>上下文管理器对象存在的目的是管理with块，简化try/finally模式。</p></li><li><p>ContextManger实现的两种方式：</p><ol><li>编写一个类，实现<code>__enter__</code>和<code>__exit__</code>方法</li><li>调用<a href="mailto:`@contextlib.contextmanager" target="_blank" rel="noopener">`@contextlib.contextmanager</a><code>装饰器，将生成器函数转变为上下文管理器，函数中yield之前的语句对应</code><strong>enter</strong><code>内容，yield xxx为返回的对象（对应到with func() as xxx的xxx），yield之后的语句对应</code><strong>exit</strong>`内容。<strong>始终用try语句包裹yield语句</strong></li></ol></li></ol><h1 id="16-协程"><a href="#16-协程" class="headerlink" title="16. 协程"></a>16. 协程</h1><h2 id="1-进程、线程、协程"><a href="#1-进程、线程、协程" class="headerlink" title="1. 进程、线程、协程"></a>1. 进程、线程、协程</h2><p>进程：一个运行的程序（代码）就是一个进程，没有运行的代码叫程序，进程是系统资源分配的最小单位，进程拥有自己独立的内存空间，所有进程间数据不共享，开销大。</p><p>线程: cpu调度执行的最小单位，也叫执行路径，不能独立存在，依赖进程存在，一个进程至少有一个线程，叫主线程，而多个线程共享内存（数据共享，共享全局变量),从而极大地提高了程序的运行效率。 </p><p>协程: 可以理解一种<strong>用户态的轻量级线程</strong>，协程的调度完全由用户控制。协程拥有自己的寄存器上下文和栈。协程调度时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈，直接操中栈则基本没有内核切换的开销，可以不加锁的访问全局变量，所以上下文的切换非常快。</p><p>协程与子程序的区别：调用子程序执行到return之后子程序就完全返回到主程序了，而协程会保存现场，下次从中断点继续执行。（中断）</p><p>协程与线程优势：1. 没有多线程切换的开销，寄存器和栈都保存在用户态。2. 不需要锁机制，因为是在一个线程中，不存在写变量冲突问题。所以协程是一种协作式多任务，多线程是一种抢占式多任务。</p><p>Python里CPU密集型使用多进程，IO密集型使用多线程或协程。</p><h2 id="2-协程"><a href="#2-协程" class="headerlink" title="2. 协程"></a>2. 协程</h2><ol><li><p><code>b = yield a</code> 表达式左右两边在两次send()执行。</p></li><li><p>调用方调用<code>next(cor)</code>之后，协程执行到<code>yield a</code>并暂停，调用方收到返回值；调用方调用<code>cor.send(b)</code>，从中断点继续执行，将接收到的b赋值给等号左边的b，继续向下执行。当碰到下一个<code>yield a</code>时再次暂停并产出a。 </p></li><li><p><code>yield from</code>实现类似于管道的功能，调用方-委派生成器-子生成器。</p></li><li><p>生成器函数需要初始化也就是<code>f=func()</code>后f才是generator，func是function类型。</p></li></ol><h2 id="3-协程实现生产者消费者模型"><a href="#3-协程实现生产者消费者模型" class="headerlink" title="3. 协程实现生产者消费者模型"></a>3. 协程实现生产者消费者模型</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">producer</span><span class="params">(consumer)</span>:</span></span><br><span class="line">    ret = next(consumer)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        print(<span class="string">'[PRODUCER] produce: %d'</span> % i)</span><br><span class="line">        ret = consumer.send(i)</span><br><span class="line">        print(<span class="string">'[PRODUCER] consumer return: %s'</span> % ret)</span><br><span class="line">    consumer.close()</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consumer</span><span class="params">()</span>:</span></span><br><span class="line">    ret = <span class="string">''</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        i = <span class="keyword">yield</span> ret</span><br><span class="line">        print(<span class="string">'[CONSUMER] consume: %d'</span> % i)</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        ret = <span class="string">'OK'</span></span><br><span class="line">        </span><br><span class="line">c = consumer()</span><br><span class="line">producer(c)</span><br></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;14-迭代器与生成器&quot;&gt;&lt;a href=&quot;#14-迭代器与生成器&quot; class=&quot;headerlink&quot; title=&quot;14. 迭代器与生成器&quot;&gt;&lt;/a&gt;14. 迭代器与生成器&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;可迭代的对象&lt;/strong&gt;：使用i
-      
-    
-    </summary>
-    
-    
-      <category term="Python" scheme="http://chace.in/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Docker学习笔记(二)-工具及底层实现</title>
-    <link href="http://chace.in/2018/09/14/Docker%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%BA%8C)-%E5%B7%A5%E5%85%B7%E5%8F%8A%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/"/>
-    <id>http://chace.in/2018/09/14/Docker学习笔记(二)-工具及底层实现/</id>
-    <published>2018-09-14T03:15:43.000Z</published>
-    <updated>2019-06-11T03:10:29.029Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Docker-compose"><a href="#Docker-compose" class="headerlink" title="Docker compose"></a>Docker compose</h2><p>Compose 中有两个重要的概念：</p><ul><li>服务 (service)：一个应用的容器，实际上可以包括若干运行相同镜像的容器实例。</li><li>项目 (project)：由一组关联的应用容器组成的一个完整业务单元，在 docker-compose.yml 文件中定义。</li></ul><p>命令有点类似docker<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构建项目中的服务容器</span></span><br><span class="line">docker-compose build [options] [SERVICE...]</span><br><span class="line"><span class="comment"># 启动一个service</span></span><br><span class="line">docker-compose run [options] [-p PORT...] [-e KEY=VAL...] &lt;SERVICE&gt; [COMMAND] [ARGS...]</span><br><span class="line"><span class="comment"># 启动一个project</span></span><br><span class="line">docker-compose up</span><br></pre></td></tr></table></figure></p><p>然后是模板文件docker-compose.yml<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">"3"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"><span class="attr">  webapp:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">examples/web</span></span><br><span class="line"><span class="attr">    ports:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"80:80"</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">"/data"</span></span><br></pre></td></tr></table></figure></p><h2 id="Docker-machine"><a href="#Docker-machine" class="headerlink" title="Docker machine"></a>Docker machine</h2><p>Docker machine大概是个用来创建管理虚拟机的工具，当然这些虚拟机都装好了Docker Engine。通过这种方式可以方便地创建多个docker节点。</p><blockquote><p>Docker Machine is a tool that lets you install Docker Engine on virtual hosts, and manage the hosts with docker-machine commands. You can use Machine to create Docker hosts on your local Mac or Windows box, on your company network, in your data center, or on cloud providers like Azure, AWS, or Digital Ocean.</p></blockquote><h2 id="Docker-Swarm"><a href="#Docker-Swarm" class="headerlink" title="Docker Swarm"></a>Docker Swarm</h2><p>用于集群管理的一个工具。</p><h3 id="1-创建swarm集群"><a href="#1-创建swarm集群" class="headerlink" title="1.创建swarm集群"></a>1.创建swarm集群</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker swarm init --advertise-addr 192.168.99.100</span><br><span class="line"><span class="comment"># 用machine创建一个worker1节点</span></span><br><span class="line">docker-machine create -d virtualbox worker1</span><br><span class="line">docker-machine ssh worker1</span><br><span class="line"><span class="comment"># 加入swarm集群</span></span><br><span class="line">docker swarm join \</span><br><span class="line">    --token SWMTKN-1-49nj1cmql0jkz5s954yi3oex3nedyz0fb0xx14ie39trti4wxv-8vxv8rssmk743ojnwacrr2e7c \</span><br><span class="line">    192.168.99.100:2377</span><br><span class="line">docker node ls</span><br></pre></td></tr></table></figure><h3 id="2-部署服务"><a href="#2-部署服务" class="headerlink" title="2.部署服务"></a>2.部署服务</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建nginx服务</span></span><br><span class="line">docker service create --replicas 3 -p 80:80 --name nginx nginx:1.13.7-alpine</span><br><span class="line"><span class="comment"># 查看</span></span><br><span class="line">docker service ps nginx</span><br><span class="line">docker service logs nginx</span><br></pre></td></tr></table></figure><h3 id="3-在swarm集群中使用compose来快速部署"><a href="#3-在swarm集群中使用compose来快速部署" class="headerlink" title="3.在swarm集群中使用compose来快速部署"></a>3.在swarm集群中使用compose来快速部署</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker stack deploy -c docker-compose.yml wordpress</span><br><span class="line">docker stack ls</span><br><span class="line">docker stack down</span><br></pre></td></tr></table></figure><h2 id="底层实现"><a href="#底层实现" class="headerlink" title="底层实现"></a>底层实现</h2><h3 id="1-命名空间"><a href="#1-命名空间" class="headerlink" title="1. 命名空间"></a>1. 命名空间</h3><p>命名空间是 Linux内核一个强大的特性。每个容器都有自己单独的命名空间，运行在其中的应用都像是在独立的操作系统中运行一样。命名空间保证了容器之间彼此互不影响。</p><h3 id="2-控制组"><a href="#2-控制组" class="headerlink" title="2. 控制组"></a>2. 控制组</h3><p>控制组（cgroups）是Linux内核的一个特性，主要用来对共享资源进行隔离、限制、审计等。只有能控制分配到容器的资源，才能避免当多个容器同时运行时的对系统资源的竞争。</p><h3 id="3-联合文件系统"><a href="#3-联合文件系统" class="headerlink" title="3. 联合文件系统"></a>3. 联合文件系统</h3><p>联合文件系统（UnionFS）是一种分层、轻量级并且高性能的文件系统，它支持对文件系统的修改作为一次提交来一层层的叠加，同时可以将不同目录挂载到同一个虚拟文件系统下(unite several directories into a single virtual filesystem)。</p><h3 id="4-网络"><a href="#4-网络" class="headerlink" title="4. 网络"></a>4. 网络</h3><p>Docker 创建一个容器的时候，会执行如下操作：</p><ul><li>创建一对虚拟接口，分别放到本地主机和新容器中；</li><li>本地主机一端桥接到默认的 docker0 或指定网桥上，并具有一个唯一的名字，如 veth65f9；</li><li>容器一端放到新容器中，并修改名字作为 eth0，这个接口只在容器的命名空间可见；</li><li>从网桥可用地址段中获取一个空闲地址分配给容器的 eth0，并配置默认路由到桥接网卡 veth65f9。</li></ul><p>参考：<a href="https://www.kancloud.cn/docker_practice/docker_practice/469861" target="_blank" rel="noopener">Docker 网络实现</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;Docker-compose&quot;&gt;&lt;a href=&quot;#Docker-compose&quot; class=&quot;headerlink&quot; title=&quot;Docker compose&quot;&gt;&lt;/a&gt;Docker compose&lt;/h2&gt;&lt;p&gt;Compose 中有两个重要的概念：&lt;/p&gt;
-      
-    
-    </summary>
-    
-    
-      <category term="Docker" scheme="http://chace.in/tags/Docker/"/>
     
   </entry>
   
