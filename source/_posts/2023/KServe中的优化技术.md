@@ -6,8 +6,6 @@ tags:
  - 机器学习
 ---
 
-# KServe中的优化技术
-
 在上一篇KubeFlow的文章中已经介绍过KServe，KServer是一个用于在k8s上部署推理服务的框架。
 
 这一篇更细节地分析KServe中的2项技术: ModelMesh和Batcher。
