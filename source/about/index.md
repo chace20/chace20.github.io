@@ -3,14 +3,18 @@ author: chace
 comments: true
 date: 2015-08-28 12:55:07+00:00
 layout: page
-link: http://chace.in/about/
-slug: about
+link: http://chace.in/whoami/
+slug: whoami
 title: whoami
 ---
 
 Hello, I’m chace。
 
-目前从事AIGC工作，负责AI绘图平台以及机器学习平台的开发和维护。
+软件工程师，现居广州。
+
+从事过2年的DevOps平台开发工作，从0到1，再从1到100，对云原生、k8s、支撑大规模业务上云有丰富的经验。
+
+近1年从事AIGC工作，负责AI绘图平台以及机器学习平台的开发和维护，持续探索AI的能力边界。
 
 欢迎交流学习～
 
@@ -26,7 +30,7 @@ Hello, I’m chace。
 
 外部资料：[网易游戏机器学习云平台助力AI应用落地实践](https://developer.aliyun.com/ebook/8109/112701)
 
-2020-2022   网易游戏应用交付平台的开发和维护
+2020-2022   网易游戏DevOps平台的开发和维护
 
 外部资料：[效率提升10倍，网易游戏面向终态的应用交付实践](https://www.51cto.com/article/708517.html)
 
