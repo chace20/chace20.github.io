@@ -47,3 +47,13 @@ Hello, I’m chace。
 计算机科学与技术，本科
 
 经历：大三担任[SysLab](https://github.com/Sys-Lab)工作室学生负责人，负责招新培训、组织参加比赛、创新创业项目的孵化等
+
+# 专业认证
+
+**[AWS高级架构师认证](https://ouvhhkkplk.feishu.cn/file/Qco8bwGJNo6tVzxYfKxc6XeFnQX)**
+
+熟悉AWS的网络、容器平台ECS/EKS等内容
+
+**[CKA(Certified Kubernetes Administrator)认证](https://ouvhhkkplk.feishu.cn/file/C8nqb0dHloGL1NxFw5Mc0qotnph)**
+
+具备生产级别K8S部署、维护能力
