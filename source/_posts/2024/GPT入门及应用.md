@@ -9,7 +9,7 @@ tags:
 
 最近受朋友邀请，在IFC做了一次分享，最终做了95页PPT，讲了2.5h。收获还是很多，也算是一种交流学习吧。
 
-<image src="./img/2024/intro_to_GPT.jpeg" alt="GPT入门及应用现场照片" width="50%" height="50%">
+<image src="/img/2024/intro_to_GPT.jpeg" alt="GPT入门及应用现场照片" width="50%" height="50%">
 
 ## 原理与技术
 - 从生成式AI讲起: AI简史
