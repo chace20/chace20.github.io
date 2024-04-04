@@ -9,7 +9,7 @@ tags:
 
 最近受朋友邀请，在IFC做了一次分享，最终做了95页PPT，讲了2.5h。收获还是很多，也算是一种交流学习吧。
 
-![GPT入门及应用现场照片](./img/2024/intro_to_GPT.jpeg)
+<image src="./img/2024/intro_to_GPT.jpeg" alt="GPT入门及应用现场照片" width="50%" height="50%">
 
 ## 原理与技术
 - 从生成式AI讲起: AI简史
@@ -22,6 +22,6 @@ tags:
 - 商业落地场景: 产业链分析，创业团队
 - 社会问题: 假新闻，失业，智能化社会
 
-如果下面的内容太小，可以直接点击这里跳转：[GPT入门及应用]("https://docs.google.com/presentation/d/e/2PACX-1vQewzKylcByD5CRpr3E1-K8_3PRUH_9Ai6W_v531HkSRmB9pFx3pW66jsanddw6NJcpI3HeoLYN-Der/embed?start=false&loop=false&delayms=3000" )
+如果下面的内容太小，可以直接点击这里跳转：[GPT入门及应用](https://docs.google.com/presentation/d/e/2PACX-1vQewzKylcByD5CRpr3E1-K8_3PRUH_9Ai6W_v531HkSRmB9pFx3pW66jsanddw6NJcpI3HeoLYN-Der/embed?start=false&loop=false&delayms=3000)
 
-{% iframe https://docs.google.com/presentation/d/e/2PACX-1vQewzKylcByD5CRpr3E1-K8_3PRUH_9Ai6W_v531HkSRmB9pFx3pW66jsanddw6NJcpI3HeoLYN-Der/embed?start=false&loop=false&delayms=3000" %}
+{% iframe https://docs.google.com/presentation/d/e/2PACX-1vQewzKylcByD5CRpr3E1-K8_3PRUH_9Ai6W_v531HkSRmB9pFx3pW66jsanddw6NJcpI3HeoLYN-Der/embed?start=false&loop=false&delayms=3000 %}
