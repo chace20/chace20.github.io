@@ -14,25 +14,26 @@ Hello, I’m chace。
 
 从事过2年的DevOps平台开发工作，对云原生、k8s、支撑大规模业务上云有丰富的经验。
 
-近2年从事AIGC工作，负责AI绘图平台、机器学习平台以及AI for coding的落地，持续探索AI的能力边界。
+近2年从事AIGC领域工作，负责AI绘图平台、机器学习平台以及AI coding的落地，持续探索AI的能力边界。
 
-欢迎交流学习～
+欢迎交流～
 
 # 联系方式
 
 - Email:  chao9420@gmail.com
-- 知乎:  https://www.zhihu.com/people/chace20
 - Github:  https://github.com/chace20
+- 小红书:  @chace
 
 # 工作经历
 
-2024-至今    AI for coding平台
+2024-2025    CodeMaker: AI coding平台
 
 1. 静态代码扫描：集成SonarQube、CodeQL、PHPStan等多种扫描工具，支持Python、Java、C++、Go、PHP、JS等主流语言的静态代码扫描
 2. C++扫描在UE上的适配：攻克C++扫描在大型游戏项目上的落地难题，支持3000W+行代码扫描，扫描效果达到业务方预期
-3. AI Review：基于dify搭建评测管线，构造测试用例，评测不同AI Prompt和模型的能力在AI Review上的能力。
+3. AI Review部分：采用Treesitter对代码diff进行预处理，接着使用 Prompt + Classification + Filter方式提升AI review的F1指标
+4. 搭建实验平台评测不同AI模型、不同策略下Review的F1指标情况，辅助系统的演进
 
-2023-2024    AI生图平台的开发和维护
+2023-2024    DreamMaker: AI生图平台的开发和维护
 
 1. 对 webui、comfyui 进行二次开发，拆分webui的单体架构使之能分布式运行，支持300+ 卡A30和4090 GPU资源调度
 2. 工程架构优化：重构后端架构，采用长短队列分离、共享独占算力池、模型缓存等多种手段，满足100QPS 出图吞吐，模型缓存命中率≥80%
