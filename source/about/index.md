@@ -23,6 +23,7 @@ Hello, I’m chace。
 - Email:  chao9420@gmail.com
 - Github:  https://github.com/chace20
 - 小红书:  @chace
+- 作品:   [Fluent](https://fluentsay.com/)
 
 # 工作经历
 
